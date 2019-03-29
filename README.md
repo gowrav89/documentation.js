@@ -95,3 +95,61 @@ command type:DynamicSceneRemoved
 
    Flow
    socket(packet)->controller(processor)->preprocessor(doNothing)->genericModel(execute)->genericModel(remove)
+   
+   
+   <a name="1050"></a>
+## 6)AlmondProperties (Command 1050)
+   Command no
+   1050- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.hmset on AL_<data.AlmondMAC>								// if (data[key])
+
+   SQL
+   3.SELECT on ALMONDPROPERTIES
+   params:AlmondMAC
+
+   4.UPDATE on AlmondProperties2
+   params:AlmondMAC
+
+   5.select from NotificationID 
+   params:UserID 
+
+   14.select from SCSIDB.CMSAffiliations CA,                 // if (!MACS[data.almondMAC])
+                  lmondplusDB.AlmondUsers AU,
+                  SCSIDB.CMS CMS   
+     params:CA.CMSCode=CMS.CMSCode and AU.AlmondMAC = CA.AlmondMAC                                
+
+   Redis
+   6.hmget on AL_<almondMAC>
+
+   7.LPUSH on AlmondMAC_Client
+
+   8.LTRIM on AlmondMAC_Client                              // if (res > count + 1)
+
+   9.expire AlmondMAC_Client                                // if (res == 1)
+
+   10. LPUSH on AlmondMAC_All
+
+   11.LTRIM on AlmondMAC_All                                 // if (res > count + 1)
+
+   12.expire AlmondMAC_All                                  // if (res == 1)
+
+     Functional
+   1.Command 1050
+
+   13.delete ans.AlmondMAC;
+      delete ans.CommandType;
+      delete ans.Action;
+      delete ans.HashNow;
+      delete ans.Devices;
+      delete ans.epoch;
+      return ans
+
+   Flow
+   socket(packet)->controller(processor)->preprocessor(doNothing)->DynamicAlmondProperties(redisUpdate)->genericModel(get)->notification(mainFunction)->container(almondProperties),container(propertiesNotification),getAlmondName->cassandra(qtoCassHistory),addToHttpRedis(pushToRedis)->sendNotification,cassandra.qtoCassConverter,getNotificationData->scsi(sendFinal),CMS(sendFinal)
+   
+   
