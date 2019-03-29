@@ -77,3 +77,21 @@ command type:DynamicSceneRemoved
 
    Flow
    socket(packet)->controller->processor->genericModel.execute->genericModel.remove
+<a name="1300e"></a>
+
+## 5)DynamicSceneRemoved (Command 1300)
+   Command no
+   1300- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQl
+   2.Delete on SCENE
+     params:AlmondMAC
+
+   Functional
+   1.Command 1300
+
+   Flow
+   socket(packet)->controller(processor)->preprocessor(doNothing)->genericModel(execute)->genericModel(remove)
