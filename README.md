@@ -20,7 +20,7 @@ command type:DynamicSceneAdded
 
 <a name="1300b"></a>
 command type:DynamicSceneActivated
-## 1)Command 1300
+## 2)Command 1300
    Command no
    1300- JSON format
 
@@ -41,7 +41,7 @@ command type:DynamicSceneActivated
 
 <a name="1300c"></a>
 command type:DynamicSceneUpdated
-## 1)Command 1300
+## 3)Command 1300
    Command no
    1300- JSON format
 
