@@ -147,7 +147,9 @@ command type:DynamicSceneRemoved
    10. LPUSH on AlmondMAC_All                               //params: redisData
 
    11.LTRIM on AlmondMAC_All                               // if (res > count + 1)
-
+                 
+		 (or)
+		 
    11.expire AlmondMAC_All                                // if (res == 1)
 
    postgres
