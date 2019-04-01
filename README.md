@@ -97,7 +97,8 @@ command type:DynamicSceneRemoved
    socket(packet)->controller(processor)->preprocessor(doNothing)->genericModel(execute)->genericModel(remove)
    
    
-   <a name="1050"></a>
+
+ <a name="1050"></a>
 ## 6)AlmondProperties (Command 1050)
    Command no
    1050- JSON format
@@ -106,7 +107,7 @@ command type:DynamicSceneRemoved
    Command,CommandType,Payload,almondMAC
 
    Redis
-   2.hmset on AL_<data.AlmondMAC>								// if (data[key])
+								// if (data[key])
 
    SQL
    3.SELECT on ALMONDPROPERTIES
@@ -118,28 +119,57 @@ command type:DynamicSceneRemoved
    5.select from NotificationID 
    params:UserID 
 
-   14.select from SCSIDB.CMSAffiliations CA,                 // if (!MACS[data.almondMAC])
+   18.Update on AlmondplusDB.NotificationID
+   params:RegID
+
+   19.Delete on AlmondplusDB.NotificationID               //if (oldRegid && oldRegid.length > 0)
+   params: RegI
+
+   20.select from SCSIDB.CMSAffiliations CA,             // if (!MACS[data.almondMAC])
                   lmondplusDB.AlmondUsers AU,
                   SCSIDB.CMS CMS   
-     params:CA.CMSCode=CMS.CMSCode and AU.AlmondMAC = CA.AlmondMAC                                
+   params: CA.CMSCode,AU.AlmondMAC                            
 
    Redis
-   6.hmget on AL_<almondMAC>
+   2.hmset on AL_<data.AlmondMAC>                          // params: [redisKey[key], data[key]]
 
-   7.LPUSH on AlmondMAC_Client
+   6.hmget on AL_<almondMAC>                               // params: ["name"]
 
-   8.LTRIM on AlmondMAC_Client                              // if (res > count + 1)
 
-   9.expire AlmondMAC_Client                                // if (res == 1)
+   7.LPUSH on AlmondMAC_device                             // params: redisData
 
-   10. LPUSH on AlmondMAC_All
+   8.LTRIM on AlmondMAC_device                             // if (res > count + 1)
 
-   11.LTRIM on AlmondMAC_All                                 // if (res > count + 1)
+            (or)
 
-   12.expire AlmondMAC_All                                  // if (res == 1)
+   8.expire on AlmondMAC_device                             // if (res == 1)
 
-     Functional
+   10. LPUSH on AlmondMAC_All                               //params: redisData
+
+   11.LTRIM on AlmondMAC_All                               // if (res > count + 1)
+
+   11.expire AlmondMAC_All                                // if (res == 1)
+
+   postgres
+   12.INSERT INTO recentactivity
+      params:mac, id, time, index_id,index_name, name, type, value
+
+   
+   cassandra
+   15.INSERT INTO notification_store.notification_records
+      params:usr_id,noti_time,i_time,msg  
+
+   16.select from notification_store.badger
+      params:usr_id
+
+   17.UPDATE notification_store.badger  
+      params:usr_id
+
+
+   Functional
    1.Command 1050
+
+   
 
    13.delete ans.AlmondMAC;
       delete ans.CommandType;
@@ -147,9 +177,10 @@ command type:DynamicSceneRemoved
       delete ans.HashNow;
       delete ans.Devices;
       delete ans.epoch;
-      return ans
+      
+   14.delete input.users
 
    Flow
-   socket(packet)->controller(processor)->preprocessor(doNothing)->DynamicAlmondProperties(redisUpdate)->genericModel(get)->notification(mainFunction)->container(almondProperties),container(propertiesNotification),getAlmondName->cassandra(qtoCassHistory),addToHttpRedis(pushToRedis)->sendNotification,cassandra.qtoCassConverter,getNotificationData->scsi(sendFinal),CMS(sendFinal)
+    socket(packet)->controller(processor)->preprocessor(doNothing)->DynamicAlmondProperties(redisUpdate)->genericModel(get)->notification(mainFunction)->container(almondProperties),container(propertiesNotification),getAlmondName->cassandra(qtoCassHistory),addToHttpRedis(pushToRedis)->sendNotification,cassandra.qtoCassConverter,getNotificationData->scsi(sendFinal),CMS(sendFinal)
    
    
