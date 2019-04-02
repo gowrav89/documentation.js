@@ -77,8 +77,8 @@ command type:DynamicSceneRemoved
 
    Flow
    socket(packet)->controller->processor->genericModel.execute->genericModel.remove
+   
 <a name="1300e"></a>
-
 ## 5)DynamicSceneRemoved (Command 1300)
    Command no
    1300- JSON format
@@ -186,7 +186,7 @@ command type:DynamicSceneRemoved
     socket(packet)->controller(processor)->preprocessor(doNothing)->DynamicAlmondProperties(redisUpdate)->genericModel(get)->notification(mainFunction)->container(almondProperties),container(propertiesNotification),getAlmondName->cassandra(qtoCassHistory),addToHttpRedis(pushToRedis)->sendNotification,cassandra.qtoCassConverter,getNotificationData->scsi(sendFinal),CMS(sendFinal)
    
     <a name="1200"></a>
-## 3)DynamicDeviceAdded (Command 1200)
+## 7)DynamicDeviceAdded (Command 1200)
    Command no
    1200- JSON format
 
