@@ -185,4 +185,31 @@ command type:DynamicSceneRemoved
    Flow
     socket(packet)->controller(processor)->preprocessor(doNothing)->DynamicAlmondProperties(redisUpdate)->genericModel(get)->notification(mainFunction)->container(almondProperties),container(propertiesNotification),getAlmondName->cassandra(qtoCassHistory),addToHttpRedis(pushToRedis)->sendNotification,cassandra.qtoCassConverter,getNotificationData->scsi(sendFinal),CMS(sendFinal)
    
-   
+    <a name="1200"></a>
+## 3)DynamicDeviceAdded (Command 1200)
+   Command no
+   1200- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   /*if(Object.keys(variables).length==0) */
+   2.multi.hmset on MAC:%s, AlmondMAC key variable
+
+   /* if (deviceArray.length>0) */
+   3.multi.hmset on MAC:%s, AlmondMAC
+
+   SQL
+   4.insert into  AlmondplusDB.DEVICE_DATA 
+   Params:AlmondMAC
+
+   5.select from SCSIDB.CMSAffiliations CA,AlmondplusDB.AlmondUsers AU,SCSIDB.CMS CMS 
+   Params:CA.CMSCode, AU.AlmondMAC 
+
+   Functional
+   1.Command 1200
+
+   Flow
+   socket(packet)->controller(processor)->preprocessor(dymamicAddAllDevice)->model(device.execute),redisDeviceValue,genericModel-> scsi(sendFinal),CMS(sendFinal),updateMACS.
+
