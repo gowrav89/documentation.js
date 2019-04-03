@@ -214,7 +214,7 @@ command type:DynamicSceneRemoved
    socket(packet)->controller(processor)->preprocessor(dymamicAddAllDevice)->model(device.execute),redisDeviceValue,genericModel-> scsi(sendFinal),CMS(sendFinal),updateMACS.
 
  a name="1500"></a>
-## 5)DynamicClientUpdated (Command 1500)
+## 8)DynamicClientUpdated (Command 1500)
    Command no
    1500- JSON format
 
