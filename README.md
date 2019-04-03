@@ -231,74 +231,72 @@ command type:DynamicSceneRemoved
    Flow
    consumer(processMessage)->controller(processor)->preprocessor(doNothing)->genericModel(execute),genericModel(add).
    
-   a name="1500"></a>
-## 9)DynamicClientAdded(Command 1500)
+ 
+<a name="1500a"></a>
+## 9)DynamicClientAdded (Command 1500)
    Command no
    1500- JSON format
 
    Required
    Command,CommandType,Payload,almondMAC
 
-   Postgres
-   9.Insert on recentactivity
-      params: mac, id, time, index_id, index_name, name, type, value
+   SQl
+   2.Insert on AlmondplusDB.WIFICLIENTS
+     params: AlmondMAC
+   3.Select on NotificationID
+     params: UserID
+   15.Update on AlmondplusDB.NotificationID
+      params:RegID
 
-   Redis
-   4.hmget on AL_<almondMAC>
-     Params:name
-   5.LPUSH on AlmondMAC_Device         // params: redisData
+   /*if (oldRegid && oldRegid.length > 0) */
+   16.Delete on AlmondplusDB.NotificationID
+      params: RegID
 
-    /* if (res > count + 1) */
-   6.LTRIM on AlmondMAC_Device                //here count = 9, res = Result from step 6
-             
-               (or)
+   REDIS
+   4.hmget on AL_<AlmondMAC>                   // params: ["name"]
+   5.LPUSH on AlmondMAC_Client                 // params: redisData
 
-    /* if (res == 1) */
-   6.expire on AlmondMAC_Device             //here, res = Result from step 6
-
-   7.LPUSH on AlmondMAC_All               //params: redisData
-    /* if (res > count + 1) */
-   8.LTRIM on AlmondMAC_All                //here count = 19, res = Result from step 8
+   /* if (res > count + 1) */
+   6.LTRIM on AlmondMAC_Client                //here count = 9, res = Result from step 5
              
               (or)
 
-    /* if (res == 1) */
-   8.expire on AlmondMAC_All             //here, res = Result from above step 8
- 
+   /* if (res == 1) */
+   6.expire on AlmondMAC_Client             //here, res = Result from step 5
+   
+   7.LPUSH on AlmondMAC_All                // params: redisData
+   /* if (res > count + 1) */
+   8.LTRIM on AlmondMAC_All                //here count = 19, res = Result from step 7
+             
+              (or)
 
-   Cassandra   
-  12.Insert on notification_store.notification_records
-       params: usr_id, noti_time, i_time, msg  
-  13.Update on notification_store.badger  
-       params: user_id  
-  14.Select on notification_store.badger
-       params: usr_id
+   /* if (res == 1) */
+   8.expire on AlmondMAC_All             //here, res = Result from above step 7
 
-   SQL
-   2.insert into  AlmondplusDB.WIFICLIENTS
-     Params:AlmondMAC
-   3.select UserID, Platform,RegID from NotificationID
-     Params:UserID
+   Postgres
+   9.Insert on recentactivity
+     params: mac, id, time, index_id, client_id, name, type, value
 
-   15.Update on AlmondplusDB.NotificationID
-       params:RegID
-
-    /*if (oldRegid && oldRegid.length > 0) */
-   16.Delete on AlmondplusDB.NotificationID
-       params: RegI
-
-
+   Cassandra
+   12.Insert on notification_store.notification_records
+      params: usr_id, noti_time, i_time, msg
+   13.Update on notification_store.badger
+      params: usr_id
+   14.Select on notification_store.badger
+      params: usr_id
+   
    Functional
    1.Command 1500
-
    10.delete ans.AlmondMAC;
-      delete ans.CommandType;
-      delete ans.Action;
-      delete ans.HashNow;
-      delete ans.Devices;
-      delete ans.epoch;
+     delete ans.CommandType;
+     delete ans.Action;
+     delete ans.HashNow;
+     delete ans.Devices;
+     delete ans.epoch;
+   11.delete input.users;
 
-   11.delete input.users;   
+   Flow
+   socket(packet)->controller(processor)->preprocessor(doNothing)->genericModel(execute)->genericModel(add)->receive(mainFunction)->notify(sendAlwaysClient)->generator(wifiNotificationGenerator)->cassandra(qtoCassHistory)->cassandra(qtoCassConverter)->msgService(notificationHandler)->msgService(handleResponse)
+check you mistakes
 
-  Flow
-     socket(packet)->controller(processor)->preprocessor(doNothing)->almondCommands(DynamicAlmondProperties)->genericModel(get)->receive(mainFunction)->receive(almondProperties)->generator(propertiesNotification)->cassQueries(qtoCassHistory)->cassQueries(qtoCassConverter)->msgService(notificationHandler)->msgService(handleResponse).
+
