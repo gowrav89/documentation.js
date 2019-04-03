@@ -240,40 +240,38 @@ command type:DynamicSceneRemoved
    Command,CommandType,Payload,almondMAC
 
    Postgres
-   10.Insert on recentactivity
+   9.Insert on recentactivity
       params: mac, id, time, index_id, index_name, name, type, value
 
    Redis
    4.hmget on AL_<almondMAC>
      Params:name
-   6.LPUSH on AlmondMAC_Device         // params: redisData
+   5.LPUSH on AlmondMAC_Device         // params: redisData
 
     /* if (res > count + 1) */
-   7.LTRIM on AlmondMAC_Device                //here count = 9, res = Result from step 6
+   6.LTRIM on AlmondMAC_Device                //here count = 9, res = Result from step 6
              
                (or)
 
     /* if (res == 1) */
-   7.expire on AlmondMAC_Device             //here, res = Result from step 6
+   6.expire on AlmondMAC_Device             //here, res = Result from step 6
 
-   8.LPUSH on AlmondMAC_All               //params: redisData
+   7.LPUSH on AlmondMAC_All               //params: redisData
     /* if (res > count + 1) */
-   9.LTRIM on AlmondMAC_All                //here count = 19, res = Result from step 8
+   8.LTRIM on AlmondMAC_All                //here count = 19, res = Result from step 8
              
               (or)
 
     /* if (res == 1) */
-   9.expire on AlmondMAC_All             //here, res = Result from above step 8
+   8.expire on AlmondMAC_All             //here, res = Result from above step 8
  
 
    Cassandra   
-  x5.INSERT INTO recentactivity 
-     Params:mac, id, time, index_id, client_id, name, type, value
-  13.Insert on notification_store.notification_records
+  12.Insert on notification_store.notification_records
        params: usr_id, noti_time, i_time, msg  
-  14.Update on notification_store.badger  
+  13.Update on notification_store.badger  
        params: user_id  
-  15.Select on notification_store.badger
+  14.Select on notification_store.badger
        params: usr_id
 
    SQL
@@ -282,25 +280,25 @@ command type:DynamicSceneRemoved
    3.select UserID, Platform,RegID from NotificationID
      Params:UserID
 
-   16.Update on AlmondplusDB.NotificationID
+   15.Update on AlmondplusDB.NotificationID
        params:RegID
 
     /*if (oldRegid && oldRegid.length > 0) */
-   17.Delete on AlmondplusDB.NotificationID
+   16.Delete on AlmondplusDB.NotificationID
        params: RegI
 
 
    Functional
    1.Command 1500
 
-   11.delete ans.AlmondMAC;
+   10.delete ans.AlmondMAC;
       delete ans.CommandType;
       delete ans.Action;
       delete ans.HashNow;
       delete ans.Devices;
       delete ans.epoch;
 
-   12.delete input.users;   
+   11.delete input.users;   
 
   Flow
      socket(packet)->controller(processor)->preprocessor(doNothing)->almondCommands(DynamicAlmondProperties)->genericModel(get)->receive(mainFunction)->receive(almondProperties)->generator(propertiesNotification)->cassQueries(qtoCassHistory)->cassQueries(qtoCassConverter)->msgService(notificationHandler)->msgService(handleResponse).
