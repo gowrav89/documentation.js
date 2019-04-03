@@ -230,3 +230,77 @@ command type:DynamicSceneRemoved
 
    Flow
    consumer(processMessage)->controller(processor)->preprocessor(doNothing)->genericModel(execute),genericModel(add).
+   
+   a name="1500"></a>
+## 9)DynamicClientAdded(Command 1500)
+   Command no
+   1500- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Postgres
+   10.Insert on recentactivity
+      params: mac, id, time, index_id, index_name, name, type, value
+
+   Redis
+   4.hmget on AL_<almondMAC>
+     Params:name
+   6.LPUSH on AlmondMAC_Device         // params: redisData
+
+    /* if (res > count + 1) */
+   7.LTRIM on AlmondMAC_Device                //here count = 9, res = Result from step 6
+             
+               (or)
+
+    /* if (res == 1) */
+   7.expire on AlmondMAC_Device             //here, res = Result from step 6
+
+   8.LPUSH on AlmondMAC_All               //params: redisData
+    /* if (res > count + 1) */
+   9.LTRIM on AlmondMAC_All                //here count = 19, res = Result from step 8
+             
+              (or)
+
+    /* if (res == 1) */
+   9.expire on AlmondMAC_All             //here, res = Result from above step 8
+ 
+
+   Cassandra   
+  x5.INSERT INTO recentactivity 
+     Params:mac, id, time, index_id, client_id, name, type, value
+  13.Insert on notification_store.notification_records
+       params: usr_id, noti_time, i_time, msg  
+  14.Update on notification_store.badger  
+       params: user_id  
+  15.Select on notification_store.badger
+       params: usr_id
+
+   SQL
+   2.insert into  AlmondplusDB.WIFICLIENTS
+     Params:AlmondMAC
+   3.select UserID, Platform,RegID from NotificationID
+     Params:UserID
+
+   16.Update on AlmondplusDB.NotificationID
+       params:RegID
+
+    /*if (oldRegid && oldRegid.length > 0) */
+   17.Delete on AlmondplusDB.NotificationID
+       params: RegI
+
+
+   Functional
+   1.Command 1500
+
+   11.delete ans.AlmondMAC;
+      delete ans.CommandType;
+      delete ans.Action;
+      delete ans.HashNow;
+      delete ans.Devices;
+      delete ans.epoch;
+
+   12.delete input.users;   
+
+  Flow
+     socket(packet)->controller(processor)->preprocessor(doNothing)->almondCommands(DynamicAlmondProperties)->genericModel(get)->receive(mainFunction)->receive(almondProperties)->generator(propertiesNotification)->cassQueries(qtoCassHistory)->cassQueries(qtoCassConverter)->msgService(notificationHandler)->msgService(handleResponse).
