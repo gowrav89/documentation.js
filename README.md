@@ -213,3 +213,20 @@ command type:DynamicSceneRemoved
    Flow
    socket(packet)->controller(processor)->preprocessor(dymamicAddAllDevice)->model(device.execute),redisDeviceValue,genericModel-> scsi(sendFinal),CMS(sendFinal),updateMACS.
 
+ a name="1500"></a>
+## 5)DynamicClientUpdated (Command 1500)
+   Command no
+   1500- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.insert into  AlmondplusDB.WIFICLIENTS
+     Params:AlmondMAC
+
+   Functional
+   1.Command 1500
+
+   Flow
+   consumer(processMessage)->controller(processor)->preprocessor(doNothing)->genericModel(execute),genericModel(add).
