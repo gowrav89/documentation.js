@@ -212,9 +212,36 @@ command type:DynamicSceneRemoved
 
    Flow
    socket(packet)->controller(processor)->preprocessor(dymamicAddAllDevice)->model(device.execute),redisDeviceValue,genericModel-> scsi(sendFinal),CMS(sendFinal),updateMACS.
+   
+   
+   
+   a name="1500"></a>
+## 8)DynamicClientList(Command 1500)
+   Command no
+   1500- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.insert into  AlmondplusDB.WIFICLIENTS              /*if (!doBackUp)*/
+     Params:AlmondMAC
+
+   3.Delete from WIFICLIENTS
+     Params:AlmondMAC
+
+   4.insert into  AlmondplusDB.WIFICLIENTS
+     Params:AlmondMAC
+
+
+   Functional
+   1.Command 1500
+
+   Flow
+   consumer(processMessage)->controller(processor)->preprocessor(doNothing)->genericModel(execute),genericModel(addAll),insertBackUpAndUpdate,removeAndInsert.
 
  a name="1500"></a>
-## 8)DynamicClientUpdated (Command 1500)
+## 9)DynamicClientUpdated (Command 1500)
    Command no
    1500- JSON format
 
@@ -233,7 +260,7 @@ command type:DynamicSceneRemoved
    
  
 <a name="1500a"></a>
-## 9)DynamicClientAdded (Command 1500)
+## 10)DynamicClientAdded (Command 1500)
    Command no
    1500- JSON format
 
@@ -301,7 +328,7 @@ command type:DynamicSceneRemoved
    
    
    <a name="1500"></a>
-## 10)DynamicAllClientsRemoved(Command 1500)
+## 11)DynamicAllClientsRemoved(Command 1500)
    Command no
    1500- JSON format
 
