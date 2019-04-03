@@ -296,7 +296,60 @@ command type:DynamicSceneRemoved
    11.delete input.users;
 
    Flow
-   socket(packet)->controller(processor)->preprocessor(doNothing)->genericModel(execute)->genericModel(add)->receive(mainFunction)->notify(sendAlwaysClient)->generator(wifiNotificationGenerator)->cassandra(qtoCassHistory)->cassandra(qtoCassConverter)->msgService(notificationHandler)->msgService(handleResponse)
+   socket(packet)->controller(processor)->preprocessor(doNothing)->genericModel(execute)->genericModel(add)->receive(mainFunction)->notify(sendAlwaysClient)->generator(wifiNotificationGenerator)->cassandra(qtoCassHistory)->cassandra(qtoCassConverter)->msgService(notificationHandler)->msgService(handleResponse).
+   
+   
+   
+   <a name="1500"></a>
+## 10)DynamicAllClientsRemoved(Command 1500)
+   Command no
+   1500- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Cassandra
+   2.INSERT INTO  notification_store.almondhistory
+     Params:mac,type,data,time
+
+   8.INSERT INTO notification_store.notification_records
+     Params:"usr_id", "noti_time" , "i_time" , "msg"
+   
+   9.UPDATE notification_store.badger           // SET b_cnt = b_cnt + 1
+     Params:usr_id  
+
+   10.select from notification_store.badger     // b_cnt as count,usr_id as id
+     Params:usr_id  
+
+
+   SQL
+   3.Delete from WIFICLIENTS
+     Params:AlmondMAC  
+   4.select from NotificationID
+     Params:UserID 
+   11.UPDATE on AlmondplusDB.NotificationID
+     Params:RegID
+   12.DELETE FROM AlmondplusDB.NotificationID
+     Params:RegID   
+
+   Redis
+   5.hmget on AL_<almondMAC>                            //     Params: ["name"]  
+                                   
+
+   Functional
+   1.Command 1500
+
+   6.delete ans.AlmondMAC;
+     delete ans.CommandType;
+     delete ans.Action;
+     delete ans.HashNow;
+     delete ans.Devices;
+     delete ans.epoch;
+
+   7.delete input.users  
+
+   Flow
+   socket(packet)->controller(processor)->preprocessor(doNothing)->genericModel(execute)->genericModel(removeAll)->receive(mainFunction)->notify(alwaystrue)->sqlPool(getID)->generator(wifiNotificationGenerator),getAlmondName->sendNotification->cassandra(qtoCassConverter),getNotificationData,insertDynamicUpdate,loggerPoint1(execute),cassandra(getQuery),insertDynamicUpdate->msgService(notificationHandler)->msgService(qToGCMConverter),sql(updateRegID)->sql.deleteID
 
 
 
