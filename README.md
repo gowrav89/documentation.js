@@ -376,7 +376,62 @@ command type:DynamicSceneRemoved
    7.delete input.users  
 
    Flow
-   socket(packet)->controller(processor)->preprocessor(doNothing)->genericModel(execute)->genericModel(removeAll)->receive(mainFunction)->notify(alwaystrue)->sqlPool(getID)->generator(wifiNotificationGenerator),getAlmondName->sendNotification->cassandra(qtoCassConverter),getNotificationData,insertDynamicUpdate,loggerPoint1(execute),cassandra(getQuery),insertDynamicUpdate->msgService(notificationHandler)->msgService(qToGCMConverter),sql(updateRegID)->sql.deleteID
+   socket(packet)->controller(processor)->preprocessor(doNothing)->genericModel(execute)->genericModel(removeAll)->receive(mainFunction)->notify(alwaystrue)->sqlPool(getID)->generator(wifiNotificationGenerator),getAlmondName->sendNotification->cassandra(qtoCassConverter),getNotificationData,insertDynamicUpdate,loggerPoint1(execute),cassandra(getQuery),insertDynamicUpdate->msgService(notificationHandler)->msgService(qToGCMConverter),sql(updateRegID)->sql.deleteID.
+   
+   
+<a name="1200"></a>
+## 12)DynamicDeviceList(Command 1200)
+   Command no
+   1200- JSON format
+
+    Required
+   Command,CommandType,Payload,almondMAC
+
+    Redis
+   2.hgetall on MAC:<AlmondMAC> 
+     
+    multi
+   4.hmset on AL_<AlmondMAC>                    // params:["deviceRestore", "restore"]
+
+    multi
+   5.hgetall on MAC:<AlmondMAC>:deviceIds[id]
+
+     multi 
+   9.del on MAC:<almondMAC>
+
+     multi
+   10.del on MAC:<payload AlmondMAC>:<removeIds>
+
+   /*if(Object.keys(variables).length==0)*/
+     multi.
+   11.hmset on MAC:<AlmondMAC>,key,variables
+
+                (or)
+
+   /* if (deviceArray.length>0) */
+   11.multi.hmset on MAC:<AlmondMAC>, deviceArray
+
+    SQL
+   3.SELECT from DEVICE_DATA
+     Params:AlmondMAC
+   7.insert into  AlmondplusDB.DEVICE_DATA
+     Params:AlmondMAC
+
+   8.Insert on AlmondplusDB.DEVICE_DATA
+     params: AlmondMAC 
+
+   12.select  from SCSIDB.CMSAffiliations CA,AlmondplusDB.AlmondUsers AU,SCSIDB.CMS CMS
+   Params:CA.CMSCode, AU.AlmondMAC
+
+    Cassandra
+   6.INSERT INTO  notification_store.almondhistory
+   Params:mac,type,data,time 
+
+   Functional
+   1.Command 1200
+
+    Flow
+   consumer(processMessage)->controller(processor)->preprocessor(dymamicAddAllDevice)->device(addAll)->redisDeviceValue(getDeviceList)->genericModel(insertBackUpAndUpdate)->device(getDevices)->genericModel(get)->redisDeviceValue(getFormatted)->genericModel(removeAndInsert)->redisDeviceValue(addAll)->receive(mainFunction)->scsi(sendFinal)
 
 
 
