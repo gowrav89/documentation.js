@@ -521,5 +521,87 @@ command type:DynamicSceneRemoved
       params: usr_id
 
     Flow
-   socket(packet)->controller(processor)->preprocessor(dynamicIndexUpdated)->device(updateIndex)->DeviceStore(update)->updateDeviceIndex->rec(mainFunction)->container(dynamicIndexUpdate)->sql(preferenceCheck)->sql(getID)->container(generator.deviceIndexUpdat)->sql(queryDeviceData)->cassandra(qtoCassHistory),addToHttpRedis,pushToRedis->cassandra(qtoCassConverter)->getNotificationData->insertNotification->insertDynamicUpdate->cassandra(getQuery)->scsi(sendFinal)
+   socket(packet)->controller(processor)->preprocessor(dynamicIndexUpdated)->device(updateIndex)->DeviceStore(update)->updateDeviceIndex->rec(mainFunction)->container(dynamicIndexUpdate)->sql(preferenceCheck)->sql(getID)->container(generator.deviceIndexUpdat)->sql(queryDeviceData)->cassandra(qtoCassHistory),addToHttpRedis,pushToRedis->cassandra(qtoCassConverter)->getNotificationData->insertNotification->insertDynamicUpdate->cassandra(getQuery)->scsi(sendFinal).
+   
+    <a name="1500"></a>
+## 14)DynamicClientRemoved(Command 1500)
+   Command no
+   1500- JSON format
+
+    Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.select from WifiClients
+     Params:AlmondMAC, ClientID
+
+   3.Delete from WIFICLIENTS
+     Params:AlmondMAC
+
+   4.select from NotificationID 
+     Params:UserID  
+
+  16.UPDATE on AlmondplusDB.NotificationID
+     Params:RegID 
+
+  /*if (oldRegid && oldRegid.length > 0)*/
+  17.DELETE FROM AlmondplusDB.NotificationID
+     Params:RegID IN 
+
+    Redis
+   5.hmget on AL_<almondMAC>
+     // params:"name"
+
+   6.LPUSH on AlmondMAC_Clients  
+      // params: redisData 
+
+    /* if (res > count + 1) */
+   7.LTRIM on AlmondMAC_Clients               
+             
+              (or)
+
+   /* if (res == 1) */
+   7.expire on AlmondMAC_Clients    
+
+   8.LPUSH on AlmondMAC_All
+
+   /* if (res > count + 1) */
+   9.LTRIM on AlmondMAC_All
+             
+              (or)
+
+   /* if (res == 1) */
+   9.expire on AlmondMAC_All   
+
+   Postgres
+
+  10.INSERT INTO recentactivity
+     Params:mac, id, time, index_id, client_id, name, type, value  
+
+    Cassandra
+  13.INSERT INTO notification_store.notification_records 
+     Params:"usr_id", "noti_time" , "i_time" , "msg" 
+  
+  14.UPDATE notification_store.badger
+     Params:usr_id
+
+  15.select from  notification_store.badger
+     Params:usr_id   
+
+
+    Functional
+   1.Command 1200
+
+  11.delete ans.AlmondMAC;
+     delete ans.CommandType;
+     delete ans.Action;
+     delete ans.HashNow;
+     delete ans.Devices;
+     delete ans.epoch;
+
+  12.delete input.users  
+ 
+
+    Flow
+   socket(packet)->controller(processor)->preprocessor(dynamicClientRemoved)2.CP(query)->genericModel(execute)3.genericModel(remove)->container(sendAlwaysClient)->4.sql.getID-> generate(wifiNotificationGenerator)->5.getAlmondName->cassandra(qtoCassHistory)->getInsertData->addToHttpRedis->6,7.pushToRedis->8,9.pushToRedis->10.postgres(query)->cassandra(qtoCassConverter)->11.getNotificationData->12.insertNotification->13.insertDynamicUpdate-> 14.insertDynamicUpdate->15insertDynamicUpdate->msgService(notificationHandler)->msgService(qToGCMConverter)->msgService(handleResponse)->16.sql(updateRegID)->17.sql(deleteID).
    
