@@ -433,5 +433,94 @@ command type:DynamicSceneRemoved
     Flow
    consumer(processMessage)->controller(processor)->preprocessor(dymamicAddAllDevice)->device(addAll)->redisDeviceValue(getDeviceList)->genericModel(insertBackUpAndUpdate)->device(getDevices)->genericModel(get)->redisDeviceValue(getFormatted)->genericModel(removeAndInsert)->redisDeviceValue(addAll)->receive(mainFunction)->scsi(sendFinal)
 
+<a name="1200"></a>
+## 13)DynamicIndexUpdated(Command 1200)
+   Command no
+   1200- JSON format
+
+    Required
+   Command,CommandType,Payload,almondMAC
+
+    Redis
+    /*if(data.index == 0 && packet.cmsCode)*/
+    2.hgetall on MAC:<almondMAC>,data.deviceId
+
+    /*if(Object.keys(variables).length==0)*/
+     multi.
+    3.hmset on MAC:<AlmondMAC>,key,variables
+
+                 (or)
+
+   /* if (deviceArray.length>0) */
+   multi
+   3.hmset on MAC:<AlmondMAC>, deviceArray
+
+   7.LPUSH on AlmondMAC_Device  
+      // params: redisData  
+   
+    /* if (res > count + 1) */
+   8.LTRIM on AlmondMAC_Device                
+             
+              (or)
+
+   /* if (res == 1) */
+   8.expire on AlmondMAC_Device  
+
+   9.LPUSH on AlmondMAC_All
+
+   /* if (res > count + 1) */
+   10.LTRIM on AlmondMAC_All
+             
+              (or)
+
+   /* if (res == 1) */
+   10.expire on AlmondMAC_All  
+                                   
+
+    SQL
+   4.SELECT AlmondplusDB.NotificationPreferences
+     Params:AlmondMAC, DeviceID, UserID IN
+   5.select from NotificationID
+     Params:UserID
+   6.select from DeviceData
+     Params:AlmondMAC, DeviceID 
+
+   17.Update on AlmondplusDB.NotificationID
+      params:RegID
+
+   /*if (oldRegid && oldRegid.length > 0) */
+   18.Delete on AlmondplusDB.NotificationID
+      params: RegID
+      
+   19.select from SCSIDB.CMSAffiliations CA,AlmondplusDB.AlmondUsers AU,SCSIDB.CMS CMS
+      Params:CA.CMSCode, AU.AlmondMAC   
+
+    postgres
+   11.Insert on recentactivity
+     params: mac, id, time, index_id,index_name, name, type, value
+
+    Functional
+   1.Command 1200
+
+  12.delete ans.AlmondMAC;
+     delete ans.CommandType;
+     delete ans.Action;
+     delete ans.HashNow;
+     delete ans.Devices;
+     delete ans.epoch;
+
+   13delete input.users  
+
+     cassandra
+   14.INSERT INTO notification_store.notification_records
+     params:"usr_id", "noti_time" , "i_time" , "msg"
+
+   15.Update on notification_store.badger
+      params: usr_id
+   16.Select on notification_store.badger
+      params: usr_id
+
+    Flow
+   socket(packet)->controller(processor)->preprocessor(dynamicIndexUpdated)->device(updateIndex)->DeviceStore(update)->updateDeviceIndex->rec(mainFunction)->container(dynamicIndexUpdate)->sql(preferenceCheck)->sql(getID)->container(generator.deviceIndexUpdat)->sql(queryDeviceData)->cassandra(qtoCassHistory),addToHttpRedis,pushToRedis->cassandra(qtoCassConverter)->getNotificationData->insertNotification->insertDynamicUpdate->cassandra(getQuery)->scsi(sendFinal)
 
 
