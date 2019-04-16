@@ -1,3 +1,25 @@
+## 1)Command 1300-DynamicSceneAdded
+## 2)Command 1300-DynamicSceneActivated
+## 3)Command 1300-DynamicSceneUpdated
+## 4)Command 1300-DynamicSceneRemoved
+## 5)Command 1300-DynamicSceneRemoved 
+## 6)Command 1050-AlmondProperties 
+## 7)Command 1200-DynamicDeviceAdded
+## 8)Command 1500-DynamicClientList
+## 9)Command 1500-DynamicClientUpdated 
+## 10)Command 1500-DynamicClientAdded
+## 11)Command 1500-DynamicAllClientsRemoved
+## 12)Command 1200-DynamicDeviceList
+## 13)Command 1200-DynamicIndexUpdated
+## 14)Command 1500-DynamicClientRemoved
+## 15)Command 1200-DynamicDeviceRemoved
+## 16)Command 49-DynamicAlmondNameChange
+## 17)Command 153-DynamicAlmondModeChangeRequest
+## 18)Command 1200-DynamicAllDevicesRemoved
+## 19)Command 1500-DynamicClientJoined 
+## 20)Command 1500-DynamicClientLeft
+
+
 <a name="1300"></a>
 command type:DynamicSceneAdded
 ## 1)Command 1300
