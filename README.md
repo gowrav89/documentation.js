@@ -22,6 +22,7 @@
 ## 22)Command 1400-DynamicRuleUpdated
 ## 23)Command 1400-DynamicRuleRemoved
 ## 24)Command 1400-DynamicAllRulesRemoved
+## 25)Command 1200-DynamicDeviceUpdated
 
 
 <a name="1300"></a>
@@ -1026,4 +1027,33 @@ socket(packet)->controller(processor)->preprocessor(doNothing)->model(device.exe
 
    Flow
    socket(packet)->controller(processor)->preprocessor(doNothing)->model(genericModel.execute)-> genericModel(removeAll).
+   
+   
+      <a name="1200"></a>
+## 25)DynamicDeviceUpdated(Command 1200)
+   Command no
+   1200- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+    multi
+    2.hmset on MAC:<AlmondMAC> key, variables
+
+    /*if (deviceArray.length>0) */
+    multi
+    3.hmset on MAC:<AlmondMAC> deviceArray
+
+   SQL
+   4.insert into  AlmondplusDB.DEVICE_DATA
+    Params:AlmondMAC 
+   5.select from SCSIDB.CMSAffiliations CA,AlmondplusDB.AlmondUsers AU,SCSIDB.CMS CMS 
+    Params:CA.CMSCode=CMS.CMSCode and AU.AlmondMAC = CA.AlmondMAC 
+
+   Functional
+    1.Command 1200
+
+   Flow
+   socket(packet)->controller(processor)->preprocessor(dynamicDeviceUpdated)->model(device.execute)->DeviceStore(update)->genericModel(add)->scsi(sendFinal)->CMS(sendFinal).
 
