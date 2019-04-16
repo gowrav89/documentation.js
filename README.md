@@ -22,6 +22,7 @@
 ## 22)Command 1400-DynamicRuleRemoved
 ## 23)Command 1400-DynamicAllRulesRemoved
 ## 24)Command 1200-DynamicDeviceUpdated
+## 25)Command 1300-DynamicAllSceneRemoved
 
 
 <a name="1300a"></a>
@@ -1051,5 +1052,23 @@ command type:DynamicSceneRemoved
    Functional
     1.Command 1200
 
+   Flow   socket(packet)->controller(processor)->preprocessor(dynamicDeviceUpdated)->model(device.execute)->DeviceStore(update)->genericModel(add)->scsi(sendFinal)->CMS(sendFinal).
+   
+   
+    <a name="1300"></a>
+## 25)DynamicAllSceneRemoved(Command 1300)
+   Command no
+   1300- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.Delete from SCENE
+    Params:AlmondMAC
+
+   Functional
+    1.Command 1300
+
    Flow
-   socket(packet)->controller(processor)->preprocessor(dynamicDeviceUpdated)->model(device.execute)->DeviceStore(update)->genericModel(add)->scsi(sendFinal)->CMS(sendFinal).
+   socket(packet)->controller(processor)->preprocessor(doNothing)->model(genericModel.execute)->genericModel(remove).
