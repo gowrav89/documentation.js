@@ -20,13 +20,8 @@
 ## 20)Command 1500-DynamicClientLeft
 
 
-
-
-
-
 <a name="1300"></a>
-command type:DynamicSceneAdded
-## 1)Command 1300
+## 1)DynamicSceneAdded (Command 1300)
    Command no
    1300- JSON format
 
@@ -45,8 +40,7 @@ command type:DynamicSceneAdded
 
 
 <a name="1300b"></a>
-command type:DynamicSceneActivated
-## 2)Command 1300
+## 2)DynamicSceneActivated (Command 1300)
    Command no
    1300- JSON format
 
@@ -66,8 +60,7 @@ command type:DynamicSceneActivated
 
 
 <a name="1300c"></a>
-command type:DynamicSceneUpdated
-## 3)Command 1300
+## 3)DynamicSceneUpdated (Command 1300)
    Command no
    1300- JSON format
 
@@ -86,8 +79,7 @@ command type:DynamicSceneUpdated
    socket(packet)->controller->processor->genericModel.execute->genericModel.update->genericModel.add
 
    <a name="1300d"></a>
-command type:DynamicSceneRemoved
-## 4)Command 1300
+## 4)DynamicSceneRemoved (Command 1300)
    Command no
    1300- JSON format
 
