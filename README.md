@@ -1072,3 +1072,168 @@ command type:DynamicSceneRemoved
 
    Flow
    socket(packet)->controller(processor)->preprocessor(doNothing)->model(genericModel.execute)->genericModel(remove).
+   
+   
+   
+   
+   
+   
+   
+   
+   <a name="1061"></a>
+command type:ActivateScene
+## 1)Command 1061
+   Command no
+   1061- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.hgetall on AL_<AlmondMAC>
+
+   3.get on ICID_<string>    // here <string> = random string data)
+
+   4.Code on ICID:<Timeout>:config.SERVER_NAME    // here <string> = random string data)
+
+   Functional
+   1.Command 1061
+
+   Flow
+   socket(on)->LOG(debug)->validator(do)->processor(do)-> commandMapping(almond.onlyUnicast)->almond(onlyUnicast)->RM(getAlmond)->RM(redisExecute)->redisClient(query)->RM(setAndExpire)-> redisClient(setex).
+
+
+
+   <a name="1100"></a>
+command type:RouterSummary
+## 2)Command 1100
+   Command no
+   1100- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.hgetall on AL_<AlmondMAC>
+
+   3.get on ICID_<string>    // here <string> = random string data)
+
+   4.ICID on Code(get_random_string):<Timeout>:config.SERVER_NAME
+
+   Functional
+   1.Command 1100
+
+   Flow
+   socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(almond.onlyUnicast)->redisClient(query)
+
+
+
+   <a name="1500"></a>
+command type:ClientList
+## 3)Command 1500
+   Command no
+   1500- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.SELECT from WIFICLIENTS
+   Params:AlmondMAC
+
+   Functional
+   1.Command 1500
+
+   Flow
+   socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping.model->genericModel(execute)->genericModel(get)->genericModel(hash).
+
+
+
+   <a name="1700a"></a>
+command type:GetClientPreferences
+## 4)Command 1700
+   Command no
+   1700- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   /*if (data.Action == "get")*/
+   2.Select From  ClientPreferences
+   Params: AlmondMAC,  UserID
+
+   Functional
+   1.Command 1700
+
+
+   Flow
+   socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping.model->preferences(do)->genericModel(select).
+
+
+
+ <a name="1700b"></a>
+command type:UpdateClientPreference
+## 5)Command 1700
+   Command no
+   1700- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.insert into ClientPreferences
+   Params: AlmondMAC,  UserID
+
+
+   Functional
+   1.Command 1700
+
+   Flow
+   socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(model)->preferences(do)->genericModel(insertOrUpdate)
+
+
+
+ <a name="1700c"></a>
+command type:GetDevicePreferences
+## 6)Command 1700
+   Command no
+   1700- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   /*if (data.Action == "get")*/
+   2.Select From  NotificationPreferences
+   Params:AlmondMAC,  UserID
+
+
+   Functional
+   1.Command 1700
+
+   Flow
+   socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(model)->preferences(do)->genericModel(select)->
+
+
+
+ <a name="1700d"></a>
+command type:UpdateDevicePreference
+## 7)Command 1700
+   Command no
+   1700- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.insert into NotificationPreferences
+   Params:AlmondMAC,UserID
+
+   Functional
+   1.Command 1700
+
+   Flow
+   socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(model)->preferences(do)->  genericModel(insertOrUpdate)->
+   
+   
