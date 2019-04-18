@@ -1075,12 +1075,20 @@ command type:DynamicSceneRemoved
    
    
    
+   ## 1)Command 1061-ActivateScene
+   ## 2)Command 1100-RouterSummary
+   ## 3)Command 1500-ClientList
+   ## 4)Command 1700-GetClientPreferences
+   ## 5)Command 1700-UpdateClientPreference
+   ## 6)Command 1700-GetDevicePreferences
+   ## 7)Command 1700-UpdateDevicePreference
+   ## 8)Command 23-AffiliationUserRequest
+   ## 9)Command 1900-Logout
+   ## 10)Command 1800-UpdateNotificationRegistration
+   ## 11)Command 1112-GetAlmondList
+  
    
-   
-   
-   
-   
-   <a name="1061"></a>
+<a name="1061"></a>
 command type:ActivateScene
 ## 1)Command 1061
    Command no
@@ -1094,10 +1102,12 @@ command type:ActivateScene
 
    3.get on ICID_<string>    // here <string> = random string data)
 
-   4.Code on ICID:<Timeout>:config.SERVER_NAME    // here <string> = random string data)
+   4.Code on ICID:<Timeout>:config.SERVER_NAME   
 
    Functional
    1.Command 1061
+
+   5.Send listResponse,commandLengthType ToMobile //where listResponse = payload
 
    Flow
    socket(on)->LOG(debug)->validator(do)->processor(do)-> commandMapping(almond.onlyUnicast)->almond(onlyUnicast)->RM(getAlmond)->RM(redisExecute)->redisClient(query)->RM(setAndExpire)-> redisClient(setex).
@@ -1123,6 +1133,8 @@ command type:RouterSummary
    Functional
    1.Command 1100
 
+   5.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
    Flow
    socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(almond.onlyUnicast)->redisClient(query)
 
@@ -1143,6 +1155,8 @@ command type:ClientList
 
    Functional
    1.Command 1500
+
+   3.Send listResponse,commandLengthType ToMobile //where listResponse = payload
 
    Flow
    socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping.model->genericModel(execute)->genericModel(get)->genericModel(hash).
@@ -1166,6 +1180,7 @@ command type:GetClientPreferences
    Functional
    1.Command 1700
 
+   3.Send listResponse,commandLengthType ToMobile //where listResponse = payload
 
    Flow
    socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping.model->preferences(do)->genericModel(select).
@@ -1188,6 +1203,8 @@ command type:UpdateClientPreference
 
    Functional
    1.Command 1700
+
+   3.Send listResponse,commandLengthType ToMobile //where listResponse = payload
 
    Flow
    socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(model)->preferences(do)->genericModel(insertOrUpdate)
@@ -1212,6 +1229,8 @@ command type:GetDevicePreferences
    Functional
    1.Command 1700
 
+   3.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
    Flow
    socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(model)->preferences(do)->genericModel(select)->
 
@@ -1233,7 +1252,136 @@ command type:UpdateDevicePreference
    Functional
    1.Command 1700
 
+   3.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
    Flow
    socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(model)->preferences(do)->  genericModel(insertOrUpdate)->
+
+
+
+    <a name="23"></a>
+command type:AffiliationUserRequest
+## 8)Command 23
+   Command no
+   23- XML format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.get on CODE:<data.code>
+
+   4.get on ICID_<code>                           // here code:some random string
+
+   5.setex on ICID_<code>                         // here code:some random string
+
+   6.CODE on CODE:<120>,config.SERVER_NAME
+
+   8.hgetall on AL_:<AlmondMAC>
+
+   SQL
+   3.Select from Users
+   Params:UserID
+
+   Functional
+   1.Command 23
+
+   7.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   Flow
+   socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(model)->(affiliation.execute)->RM(getCode)->redisClient(query)->SM(getEmail)->CB(incCommandID)->generator(getCode)->RM(redisExecute)-> RM(setAndExpire)->redisClient(setex)->RM(setCode)->setAndExpire->redisClient(setex)->dispatcher(unicast)->broadcaster(unicast)->RM(getAlmond)->redisClient(query).
+
+
+
+   <a name="1900"></a>
+command type:Logout
+## 9)Command 1900
+   Command no
+   1900- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.DELETE FROM UserTempPasswords
+   Params:UserID,TempPassword
+   
+   6.Delete From NOTIFICATIONID
+   Params: parsedPayload
+
+
+   Redis                                            
+   4.hmset on UID_<socket.userid> // values = Q_config.SERVER_NAME,userSession.length 
+
+   Functional
+   1.Command 1900
+
+   3.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   /*if (userSession.length == 1)*/
+   5.delete socketStore[userid]
+
+   7.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   Flow
+   socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(model)->L(logout)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->MS(writeToMobile)->dispatcher(socketHandler)->MS(remove)->RM(redisExecute)->secondaryModel(model)->notification(do)->genericModel(delete)->dispatcher(dispatchResponse).
+
+
+
+
+    <a name="1800"></a>
+command type:UpdateNotificationRegistration
+## 10)Command 1800
+   Command no
+   1800- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.insert into NOTIFICATIONID
+   Params:parsedPayload
+
+   Functional
+   1.Command 1800
+
+   3.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   FLOW
+   socket(packet)->validator(do)->processor(do)->commandMapping(notification.do)->genericModel(insertOrUpdate)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
+
+
+
+
+   <a name="1112"></a>
+command type:GetAlmondList
+## 11)Command 1112
+   Command no
+  1112- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.hgetall on UID:<UserID>
+
+   3.hgetall on AL_<pMACs.concat(sMACs)>                       // MACs=pMACs.concat(sMACs)
+
+   SQL
+   4.select from SCSIDB.CMS
+   Params:CMSCode
+
+   6.SELECT from Users
+   Params:UserID 
+
+   Functional
+   1.Command 1112
+
+   5.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   7.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   FLOW
+   socket(packet)->validator(do)->processor(do)->commandMapping(almond.create_almond_list)->RM(getAllAlmonds)->getAlmondDetails->RM(redisExecuteAll)->getCMSPlans->dispatcher(dispatchResponse)->socketStore(writeToMobile)->MS(writeToMobile)->secondaryModel(almond.AlmondAffiliationData)->SM(getEmailIDUserID)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->MS(writeToMobile).
    
    
