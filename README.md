@@ -1086,6 +1086,7 @@ command type:DynamicSceneRemoved
    ## 9)Command 1900-Logout
    ## 10)Command 1800-UpdateNotificationRegistration
    ## 11)Command 1112-GetAlmondList
+   ## 12)Command  1003-Login
   
    
 <a name="1061"></a>
@@ -1385,3 +1386,38 @@ command type:GetAlmondList
    socket(packet)->validator(do)->processor(do)->commandMapping(almond.create_almond_list)->RM(getAllAlmonds)->getAlmondDetails->RM(redisExecuteAll)->getCMSPlans->dispatcher(dispatchResponse)->socketStore(writeToMobile)->MS(writeToMobile)->secondaryModel(almond.AlmondAffiliationData)->SM(getEmailIDUserID)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->MS(writeToMobile).
    
    
+
+<a name="1003"></a>
+command type:Login
+## 12)Command  1003
+   Command no
+  1003- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.SELECT from Date, Users
+   Params:EmailID
+
+   3.INSERT INTO UserTempPasswords
+
+   7.SELECT FROM Subscriptions 
+   Params:AlmondMAC
+
+   Redis
+   4.hgetall on UID_<zenEmail[data.EmailID]>
+
+   6.hincrby on CODE:<packet.userid> 
+                          // values = Q_config.SERVER_NAME,userSession.length,responseID
+
+   Functional
+   1.Command 1003
+
+   5.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   8.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+  
+   FLOW
+   socket(packet)->validator(do)->processor(do)->commandMapping(L.Mob_Login)->L(manualLogin)->L(Mob_Add_TempPass)->L(SetMACsToUserRedis)->RM(getAllAlmonds)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->MS(writeToMobile)->dispatcher(socketHandler)->MS(add)->RM(redisExecute)->commandMapping(secondaryModels)secondaryModel(L.GetSubscriptions)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->MS(writeToMobile).
