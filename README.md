@@ -1087,6 +1087,7 @@ command type:DynamicSceneRemoved
    ## 10)Command 1800-UpdateNotificationRegistration
    ## 11)Command 1112-GetAlmondList
    ## 12)Command  1003-Login
+   ## 13)Command  1023-AffiliationUserRequest
   
    
 <a name="1061"></a>
@@ -1396,28 +1397,68 @@ command type:Login
    Required
    Command,CommandType,Payload,almondMAC
 
+   Cassandra
+   2.Insert on logging.error_log
+     params: date,time,ip,server,category,error
+   
    SQL
-   2.SELECT from Date, Users
+   3.SELECT from Users
    Params:EmailID
 
-   3.INSERT INTO UserTempPasswords
+   4.INSERT INTO UserTempPasswords
+   Params:UserID,TempPassword,LastUsedTime
 
-   7.SELECT FROM Subscriptions 
+   8.SELECT FROM Subscriptions 
    Params:AlmondMAC
 
    Redis
-   4.hgetall on UID_<zenEmail[data.EmailID]>
+   5.hgetall on UID_<data.UserID> 
 
-   6.hincrby on CODE:<packet.userid> 
-                          // values = Q_config.SERVER_NAME,userSession.length,responseID
+   7.hincrby on UID_<data.UserID>         //values = (Q_<config.SERVER_NAME>,1)
 
    Functional
    1.Command 1003
 
-   5.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+   6.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   9.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   FLOW
+   socket(packet)->validator(do)->processor(do)->commandMapping(L.Mob_Login)->L(manualLogin)->L(Mob_Add_TempPass)->L(SetMACsToUserRedis)->RM(getAllAlmonds)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->MS(writeToMobile)->dispatcher(socketHandler)->MS(add)->RM(redisExecute)->commandMapping(secondaryModels)secondaryModel(L.GetSubscriptions)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->MS(writeToMobile).
+   
+    
+   <a name="1023"></a>
+command type:AffiliationUserRequest
+## 13)Command  1023
+   Command no
+  1023- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.get on CODE:<RoF4Mn>
+
+   4.get on ICID_<code>                                     // here code:some random string
+ 
+   5.ICID_on code:<TIMEOUT>,config.SERVER_NAME             // here code:some random string
+
+   7.CODE on RoF4Mn:<2 * 60>,values
+
+   SQL
+   3.Select from Users
+   Params:UserID
+
+   6.Select from SCSIDB.CMSAffiliations
+   Params:AlmondMAC
+
+   Functional
+   1.Command 1023
 
    8.Send listResponse,commandLengthType ToMobile //where listResponse = payload
 
-  
+   9.delete store[id]
+
    FLOW
-   socket(packet)->validator(do)->processor(do)->commandMapping(L.Mob_Login)->L(manualLogin)->L(Mob_Add_TempPass)->L(SetMACsToUserRedis)->RM(getAllAlmonds)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->MS(writeToMobile)->dispatcher(socketHandler)->MS(add)->RM(redisExecute)->commandMapping(secondaryModels)secondaryModel(L.GetSubscriptions)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->MS(writeToMobile).
+socket(packet)->validator(do)->processor(do)->commandMapping(affiliation.execute)->affiliation_getCode->2.RM(getCode)->get_emailid->3.SM(getEmail)->CB(incCommandID)->generator(getCode)->4.RM(redisExecute)->RM(setAndExpire)->5.redisClient(setex)->6.SM(getCMSCode)->RM(setCode)->7.redisClient(setex)->dispatcher(dispatchResponse)->8.socketStore(writeToMobile)->dispatcher(socketHandler)->MS(setUnicastID)->9.requestQueue(set)
+
