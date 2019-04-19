@@ -1427,7 +1427,7 @@ command type:Login
    socket(packet)->validator(do)->processor(do)->commandMapping(L.Mob_Login)->L(manualLogin)->L(Mob_Add_TempPass)->L(SetMACsToUserRedis)->RM(getAllAlmonds)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->MS(writeToMobile)->dispatcher(socketHandler)->MS(add)->RM(redisExecute)->commandMapping(secondaryModels)secondaryModel(L.GetSubscriptions)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->MS(writeToMobile).
    
     
-   <a name="1023"></a>
+  <a name="1023"></a>
 command type:AffiliationUserRequest
 ## 13)Command  1023
    Command no
@@ -1437,7 +1437,7 @@ command type:AffiliationUserRequest
    Command,CommandType,Payload,almondMAC
 
    Redis
-   2.get on CODE:<RoF4Mn>
+   2.get on CODE:<data.Code>
 
    4.get on ICID_<code>                                     // here code:some random string
  
@@ -1452,6 +1452,9 @@ command type:AffiliationUserRequest
    6.Select from SCSIDB.CMSAffiliations
    Params:AlmondMAC
 
+   Queue
+   10.Send AffiliationUserRequest to config.HTTP_SERVER_NAME
+
    Functional
    1.Command 1023
 
@@ -1460,5 +1463,32 @@ command type:AffiliationUserRequest
    9.delete store[id]
 
    FLOW
-socket(packet)->validator(do)->processor(do)->commandMapping(affiliation.execute)->affiliation_getCode->2.RM(getCode)->get_emailid->3.SM(getEmail)->CB(incCommandID)->generator(getCode)->4.RM(redisExecute)->RM(setAndExpire)->5.redisClient(setex)->6.SM(getCMSCode)->RM(setCode)->7.redisClient(setex)->dispatcher(dispatchResponse)->8.socketStore(writeToMobile)->dispatcher(socketHandler)->MS(setUnicastID)->9.requestQueue(set)
+socket(packet)->validator(do)->processor(do)->commandMapping(affiliation.execute)->affiliation_getCode->2.RM(getCode)->get_emailid->3.SM(getEmail)->CB(incCommandID)->generator(getCode)->4.RM(redisExecute)->RM(setAndExpire)->5.redisClient(setex)->6.SM(getCMSCode)->RM(setCode)->7.redisClient(setex)->dispatcher(dispatchResponse)->8.socketStore(writeToMobile)->dispatcher(socketHandler)->MS(setUnicastID)->9.requestQueue(set).
+
+
+
+<a name="1011a"></a>
+command type:SubscribeMe
+## 14)Command 1011
+   Command no
+  1011- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.hgetall on UID_:<UserID>
+
+   Queue
+   4.Send SubscribeMeResponse to config.HTTP_SERVER_NAME
+
+   Functional
+   1.Command 1011
+
+   3.delete store[id] 
+
+   5.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   FLOW
+   socket(packet)->validator(do)->processor(do)->commandMapping(SC.subscriptionCommands)->RM(getAlmonds)->requestQueue(set)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
 
