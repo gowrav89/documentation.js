@@ -1088,7 +1088,10 @@ command type:DynamicSceneRemoved
    ## 11)Command 1112-GetAlmondList
    ## 12)Command  1003-Login
    ## 13)Command  1023-AffiliationUserRequest
-  
+   ## 14)Command 1011-SubscribeMe
+   ## 15)Command 1011-PaymentDetails
+   ## 16)Command 1011-UpdateCard
+   ## 17)Command 1011-DeleteSubscription
    
 <a name="1061"></a>
 command type:ActivateScene
@@ -1490,5 +1493,86 @@ command type:SubscribeMe
    5.Send listResponse,commandLengthType ToMobile //where listResponse = payload
 
    FLOW
-   socket(packet)->validator(do)->processor(do)->commandMapping(SC.subscriptionCommands)->RM(getAlmonds)->requestQueue(set)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
+   socket(packet)->validator(do)->processor(do)->commandMapping(SC.subscriptionCommands)->RM(getAlmonds)->requestQueue(set)->AQP(sendToQueue)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
 
+
+
+<a name="1011b"></a>
+command type:PaymentDetails
+## 15)Command 1011
+   Command no
+  1011- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+
+   Redis
+   2.hgetall on UID_:<UserID>
+
+   Queue
+   4.Send PaymentDetailsResponse to config.HTTP_SERVER_NAME
+
+   Functional
+   1.Command 1011
+
+   3.delete store[id]
+
+   5.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   FLOW
+   socket(packet)->validator(do)->processor(do)->commandMapping(SC.subscriptionCommands)->RM(getAlmonds)->requestQueue(set)->AQP(sendToQueue)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
+
+
+
+<a name="1011c"></a>
+command type:UpdateCard
+## 16)Command 1011
+   Command no
+  1011- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.hgetall on UID_:<UserID>
+
+   Queue
+   4.Send UpdateCardResponse to config.HTTP_SERVER_NAME
+
+   Functional
+   1.Command 1011
+
+   3.delete store[id]
+
+   5.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   FLOW
+   socket(packet)->validator(do)->processor(do)->commandMapping(SC.subscriptionCommands)->RM(getAlmonds)->requestQueue(set)->AQP(sendToQueue)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
+
+
+
+<a name="1011c"></a>
+command type:DeleteSubscription
+## 17)Command 1011
+   Command no
+  1011- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.hgetall on UID_:<UserID>
+
+   Queue
+   4.Send DeleteSubscriptionResponse to config.HTTP_SERVER_NAME
+
+   Functional
+   1.Command 1011
+
+   3.delete store[id]
+
+   5.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   FLOW
+   socket(packet)->validator(do)->processor(do)->commandMapping(SC.subscriptionCommands)->RM(getAlmonds)->requestQueue(set)->AQP(sendToQueue)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
