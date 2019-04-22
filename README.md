@@ -1095,10 +1095,8 @@ command type:DynamicSceneRemoved
    ## 18)Command 1013-IOTScanResults
    ## 19)Command 61-AlmondNameChange
    ## 20)Command 1060-ChangeUser(action:add)
- 
-  
-   
-   
+   ## 21)Command 1110-UpdateUserProfileRequest
+   ## 22)Command 1110-DeleteAccountRequest
 
    
 <a name="1061"></a>
@@ -1662,5 +1660,81 @@ command type:ChangeUser(action:add)
 
    Flow
 socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(clients.update)->RM(getUsers)->redisClient(query)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->sendToRemoteUsers->RM(redisExecuteAll)->redisClient(query)->AQP(sendToQueue).
+
+
+<a name="1110a"></a>
+command type:UpdateUserProfileRequest
+## 21)Command 1110
+   Command no
+   1110- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.UPDATE on Users
+     params: UserID
+
+   Redis
+   4.hgetall on UID_<userID>          //here, multi is done on every userID in UserList
+
+   Queue
+   5.Send UserProfileResponse to MobileQueue
+
+   Functional
+   1.Command 1110
+
+   3.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   Flow
+socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(AM_J.UpdateUserProfile)->CP(queryFunction)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->sendToRemoteUsers->RM(redisExecuteAll)->redisClient(query)->dispatchToQueues->AQP(sendToQueue).
+
+<a name="1110b"></a>
+command type:DeleteAccountRequest
+## 23)Command 1110
+   Command no
+   1110- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+     SQL -
+   2.Select on Users
+     params:EmailID
+   3.Delete on Users
+     params: UserID
+   9.Delete on AlmondUsers
+     params: AlmondMAC
+   10.Update on AllAlmondPlus
+     params: AlmondMAC
+
+   REDIS -
+   4.hgetall on UID_<packet.userid>
+   5.del on UID_<packet.userid>
+
+   multi
+   6.hgetall on AL_<pMACs>
+
+   multi
+   7.del on AL_<pMACs>
+
+   multi
+   8.hdel on UID_<Entry[1]>           //values = SMAC_<AlmondMAC>, Entry[1] =Secondary UserID
+
+   13.hmset on UID_<data.userid>   //values = (Q_<config.SERVER_NAME>,0)
+
+   multi
+   14.hgetall on UID_<userID>          //here multi is done on every userID in userList
+
+   QUEUE -
+   15.Send DeleteAccountRequestResponse to MobileQueue
+   16.Send DeleteAccountResponse to config.HTTP_SERVER_NAME
+
+
+   FLOW -
+   socket(packet)->validator(do)->validator(checkCredentials)->processor(do)->account-manager-json(DeleteAccount)->sqlManager(deleteUser)->redisManager(redisExecute),redisManager(deleteAccount)->rowBuilder(defaultReply)->dispatcher(dispatchResponse)->mongo-store(removeAll)->dispatcher(broadcast)->broadcastBuilder(removeAll)->broadcaster(broadcast)->dispatcher(broadcastToAllAlmonds)->broadcaster(broadcastModel).
+
+
+
    
    
