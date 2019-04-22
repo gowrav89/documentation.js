@@ -1691,7 +1691,7 @@ socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(AM_J.Update
 
 <a name="1110b"></a>
 command type:DeleteAccountRequest
-## 23)Command 1110
+## 22)Command 1110
    Command no
    1110- JSON format
 
