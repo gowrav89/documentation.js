@@ -1092,6 +1092,14 @@ command type:DynamicSceneRemoved
    ## 15)Command 1011-PaymentDetails
    ## 16)Command 1011-UpdateCard
    ## 17)Command 1011-DeleteSubscription
+   ## 18)Command 1013-IOTScanResults
+   ## 19)Command 61-AlmondNameChange
+   ## 20)Command 1060-ChangeUser(action:add)
+ 
+  
+   
+   
+
    
 <a name="1061"></a>
 command type:ActivateScene
@@ -1576,3 +1584,83 @@ command type:DeleteSubscription
 
    FLOW
    socket(packet)->validator(do)->processor(do)->commandMapping(SC.subscriptionCommands)->RM(getAlmonds)->requestQueue(set)->AQP(sendToQueue)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
+   
+   
+   <a name="1013"></a>
+command type:IOTScanResults
+## 18)Command 1013
+   Command no
+  1013- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.SELECT FROM IOT_Scanner
+   Params:mac
+
+   Functional
+   1.Command 1013
+
+   3.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   FLOW
+   socket(packet)->validator(do)->processor(do)->commandMapping(almond.IOTScan)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
+   
+   
+    <a name="61"></a>
+command type:AlmondNameChange
+## 19)Command 61
+   Command no
+   61- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.hgetall on AL_<AlmondMAC>
+
+   3.get on ICID_<string>    // here <string> = random string data)
+
+   4.Code on ICID:<Timeout>:config.SERVER_NAME   
+
+   Functional
+   1.Command 61
+
+   5.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   Flow
+socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(almond.onlyUnicast)->almond(onlyUnicast)->RM(getAlmond)->RM(redisExecute)->redisClient(query)->RM(setAndExpire)-> redisClient(setex)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
+   
+   
+   <a name="1060a"></a>
+command type:ChangeUser(action:add)
+## 20)Command 1060
+   Command no
+   1060- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.UPDATE on AlmondplusDB.WifiClients
+   Params:NewName, payload.AlmondMAC, clientId
+
+   Redis
+   3.hgetall on AL_:<AlmondMAC>
+
+   multi
+   5.hgetall on UID_<userID>          //here, multi is done on every userID in UserList
+
+   Queue
+   6.Send UserProfileResponse to MobileQueue
+
+   Functional
+   1.Command 1060
+
+   4.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   Flow
+socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(clients.update)->RM(getUsers)->redisClient(query)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->sendToRemoteUsers->RM(redisExecuteAll)->redisClient(query)->AQP(sendToQueue).
+   
+   
