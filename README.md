@@ -1733,6 +1733,39 @@ command type:DeleteAccountRequest
 
    FLOW -
    socket(packet)->validator(do)->validator(checkCredentials)->processor(do)->account-manager-json(DeleteAccount)->sqlManager(deleteUser)->redisManager(redisExecute),redisManager(deleteAccount)->rowBuilder(defaultReply)->dispatcher(dispatchResponse)->mongo-store(removeAll)->dispatcher(broadcast)->broadcastBuilder(removeAll)->broadcaster(broadcast)->dispatcher(broadcastToAllAlmonds)->broadcaster(broadcastModel).
+   
+   
+   <a name="1060b"></a>
+command type:ChangeUser(action:update)
+## 23)Command 1060
+   Command no
+   1060- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.UPDATE ON AlmondplusDB.WifiClients
+   Params:Name
+
+   3.UPDATE ON AlmondplusDB.WifiClients
+   Params:NewName, payload.AlmondMAC, clientId
+
+   Redis
+   4.hgetall on AL_:<AlmondMAC>
+
+   6.hgetall on UID_<userID>          //here, multi is done on every userID in UserList
+
+   Queue
+   7.Send UserProfileResponse to MobileQueue
+
+   Functional
+   1.Command 1060
+
+   5.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   Flow
+socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(clients.update)->RM(getUsers)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->sendToRemoteUsers->RM(redisExecuteAll)->dispatchToQueues->AQP(sendToQueue).
 
 
 
