@@ -1097,8 +1097,10 @@ command type:DynamicSceneRemoved
    ## 20)Command 1060-ChangeUser(action:add)
    ## 21)Command 1110-UpdateUserProfileRequest
    ## 22)Command 1110-DeleteAccountRequest
+   ## 23)Command 1060-ChangeUser(action:update)
+   ## 24)Command 1110-ChangePasswordRequest
+  
 
-   
 <a name="1061"></a>
 command type:ActivateScene
 ## 1)Command 1061
@@ -1766,6 +1768,54 @@ command type:ChangeUser(action:update)
 
    Flow
 socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(clients.update)->RM(getUsers)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->sendToRemoteUsers->RM(redisExecuteAll)->dispatchToQueues->AQP(sendToQueue).
+
+
+
+  <a name="1110c"></a>
+command type:ChangePasswordRequest
+## 24)Command 1110
+   Command no
+   1110- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.Select on Users
+   params:EmailID
+
+   3.UPDATE on Users
+   Params:Password,EmailID
+
+   4.DELETE FROM UserTempPasswords              //if (rows.affectedRows == 1)
+   Params:UserID
+
+              (or)
+
+   4.return                  //if (rows.affectedRows == 0)        
+
+   5.DELETE FROM NotificationID
+   Params:UserID
+
+   Redis
+   7.hmset on UID_<socket.userid>      // values = Q_config.SERVER_NAME,userSession.length 
+
+   10.hgetall on UID_<userID>
+
+   Queue
+   11.Send DeleteAccountResponse to MobileQueue
+
+   Functional
+   1.Command 1110
+
+   6.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   8.delete store[id]
+
+   9.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   Flow
+socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(AM_J.ChangePassword)->AM_J(saltAndHash)->removeAllTempPass->dispatcher(dispatchResponse)->socketStore(writeToMobile)->dispatcher(socketHandler)->broadcaster(broadcast)->MS(getSockets)->requestQueue(del)->MS(sendRequest)->sendToRemoteUsers->RM(redisExecute)->dispatcher(broadcast)->broadcaster(broadcast)->sendToRemoteUsers-> RM(redisExecuteAll)->dispatchToQueues->AQP(sendToQueue).
 
 
 
