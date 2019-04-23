@@ -1099,8 +1099,9 @@ command type:DynamicSceneRemoved
    ## 22)Command 1110-DeleteAccountRequest
    ## 23)Command 1060-ChangeUser(action:update)
    ## 24)Command 1110-ChangePasswordRequest
-  
+   ## 25)Command 1110-DeleteMeAsSecondaryUserRequest
 
+  
 <a name="1061"></a>
 command type:ActivateScene
 ## 1)Command 1061
@@ -1816,6 +1817,59 @@ command type:ChangePasswordRequest
 
    Flow
 socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(AM_J.ChangePassword)->AM_J(saltAndHash)->removeAllTempPass->dispatcher(dispatchResponse)->socketStore(writeToMobile)->dispatcher(socketHandler)->broadcaster(broadcast)->MS(getSockets)->requestQueue(del)->MS(sendRequest)->sendToRemoteUsers->RM(redisExecute)->dispatcher(broadcast)->broadcaster(broadcast)->sendToRemoteUsers-> RM(redisExecuteAll)->dispatchToQueues->AQP(sendToQueue).
+
+
+<a name="1110d"></a>
+command type:DeleteMeAsSecondaryUserRequest
+## 25)Command 1110
+   Command no
+   1110- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.hgetall on AL_:<AlmondMAC>
+
+   5.hdel on AL_:<AlmondMAC>      // value:SUSER_secondaryUser
+
+   6.hdel on UID_:<secondaryUser>  // value:SMAC_AlmondMAC
+
+   8.hgetall on AL_:<AlmondMAC>
+
+   9.get on ICID_<string>              // here <string> = random string data
+
+   10.setex on ICID_<string>,TIMEOUT,config.SERVER_NAME    // here <string> = random string data
+
+   multi
+   14.hgetall on UID_<userID>
+
+   SQL
+   3.DELETE FROM AlmondSecondaryUsers
+   Params:AlmondMAC,userID
+
+   4.DELETE FROM NotificationPreferences
+   Params:AlmondMAC,userID
+     
+             (or)
+
+   4.return       // if (rows.affectedRows == 0) 
+
+   Queue
+   12.Send  DeleteMeAsSecondaryUserResponse to config.SERVER_NAME
+   15.Send DynamicAlmondDeleteResponse,DynamicUserDeleteResponse to MobileQueue
+   
+   Functional
+   1.Command 1110
+
+   7.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+  11.delete store[id]
+
+  13.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   Flow
+socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(AM_J.DeleteMeAsSecondaryUser)->RM(getAlmond)->deleteUser->SM(removeSecondaryAlmond)->RM(removeSecondaryAlmond)->RM(removeSecondaryUserFromMAC)-> RM(removeMACFromUser)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->MS(writeToMobile)->dispatcher(unicast)->broadcaster(unicast)->RM(getAlmond)->CB(incCommandID)->generator(getCode)->Random_Key->RM(redisExecute)->RM(setAndExpire)->redisClient(setex)->AQP(sendToQueue)->dispatcher(broadcast)->broadcaster(broadcast)->MS(getSockets)->requestQueue(del)->MS(sendRequest)->MS(writeToMobile)->sendToRemoteUsers->RM(redisExecuteAll)->dispatchToQueues->AQP(sendToQueue).
 
 
 
