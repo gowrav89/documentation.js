@@ -1104,9 +1104,10 @@ command type:DynamicSceneRemoved
    ## 27)Command 1110-UserInviteRequest
    ## 28)Command 1110-UnlinkAlmondRequest
    ## 29)Command 1110-UserProfileRequest
+   ## 30)Command 300-NotificationPreferences
+   ## 31)Command 283-NotificationDeleteRegistrationRequest
    
-   
-   
+
 <a name="1061"></a>
 command type:ActivateScene
 ## 1)Command 1061
@@ -1130,7 +1131,6 @@ command type:ActivateScene
 
    Flow
    socket(on)->LOG(debug)->validator(do)->processor(do)-> commandMapping(almond.onlyUnicast)->almond(onlyUnicast)->RM(getAlmond)->RM(redisExecute)->redisClient(query)->RM(setAndExpire)-> redisClient(setex).
-
 
 
    <a name="1100"></a>
@@ -1181,7 +1181,6 @@ command type:ClientList
    socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping.model->genericModel(execute)->genericModel(get)->genericModel(hash).
 
 
-
    <a name="1700a"></a>
 command type:GetClientPreferences
 ## 4)Command 1700
@@ -1205,7 +1204,6 @@ command type:GetClientPreferences
    socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping.model->preferences(do)->genericModel(select).
 
 
-
  <a name="1700b"></a>
 command type:UpdateClientPreference
 ## 5)Command 1700
@@ -1218,7 +1216,6 @@ command type:UpdateClientPreference
    SQL
    2.insert into ClientPreferences
    Params: AlmondMAC,  UserID
-
 
    Functional
    1.Command 1700
@@ -1244,7 +1241,6 @@ command type:GetDevicePreferences
    2.Select From  NotificationPreferences
    Params:AlmondMAC,  UserID
 
-
    Functional
    1.Command 1700
 
@@ -1252,7 +1248,6 @@ command type:GetDevicePreferences
 
    Flow
    socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(model)->preferences(do)->genericModel(select)->
-
 
 
  <a name="1700d"></a>
@@ -1277,8 +1272,7 @@ command type:UpdateDevicePreference
    socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(model)->preferences(do)->  genericModel(insertOrUpdate)->
 
 
-
-    <a name="23"></a>
+   <a name="23"></a>
 command type:AffiliationUserRequest
 ## 8)Command 23
    Command no
@@ -1309,7 +1303,6 @@ command type:AffiliationUserRequest
 
    Flow
    socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(model)->(affiliation.execute)->RM(getCode)->redisClient(query)->SM(getEmail)->CB(incCommandID)->generator(getCode)->RM(redisExecute)-> RM(setAndExpire)->redisClient(setex)->RM(setCode)->setAndExpire->redisClient(setex)->dispatcher(unicast)->broadcaster(unicast)->RM(getAlmond)->redisClient(query).
-
 
 
    <a name="1900"></a>
@@ -1348,7 +1341,7 @@ command type:Logout
 
 
 
-    <a name="1800"></a>
+   <a name="1800"></a>
 command type:UpdateNotificationRegistration
 ## 10)Command 1800
    Command no
@@ -1401,10 +1394,9 @@ command type:GetAlmondList
    7.Send listResponse,commandLengthType ToMobile //where listResponse = payload
 
    FLOW
-   socket(packet)->validator(do)->processor(do)->commandMapping(almond.create_almond_list)->RM(getAllAlmonds)->getAlmondDetails->RM(redisExecuteAll)->getCMSPlans->dispatcher(dispatchResponse)->socketStore(writeToMobile)->MS(writeToMobile)->secondaryModel(almond.AlmondAffiliationData)->SM(getEmailIDUserID)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->MS(writeToMobile).
+socket(packet)->validator(do)->processor(do)->commandMapping(almond.create_almond_list)->RM(getAllAlmonds)->getAlmondDetails->RM(redisExecuteAll)->getCMSPlans->dispatcher(dispatchResponse)->socketStore(writeToMobile)->MS(writeToMobile)->secondaryModel(almond.AlmondAffiliationData)->SM(getEmailIDUserID)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->MS(writeToMobile).
    
    
-
 <a name="1003"></a>
 command type:Login
 ## 12)Command  1003
@@ -1441,7 +1433,7 @@ command type:Login
    9.Send listResponse,commandLengthType ToMobile //where listResponse = payload
 
    FLOW
-   socket(packet)->validator(do)->processor(do)->commandMapping(L.Mob_Login)->L(manualLogin)->L(Mob_Add_TempPass)->L(SetMACsToUserRedis)->RM(getAllAlmonds)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->MS(writeToMobile)->dispatcher(socketHandler)->MS(add)->RM(redisExecute)->commandMapping(secondaryModels)secondaryModel(L.GetSubscriptions)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->MS(writeToMobile).
+socket(packet)->validator(do)->processor(do)->commandMapping(L.Mob_Login)->L(manualLogin)->L(Mob_Add_TempPass)->L(SetMACsToUserRedis)->RM(getAllAlmonds)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->MS(writeToMobile)->dispatcher(socketHandler)->MS(add)->RM(redisExecute)->commandMapping(secondaryModels)secondaryModel(L.GetSubscriptions)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->MS(writeToMobile).
    
     
   <a name="1023"></a>
@@ -1483,7 +1475,6 @@ command type:AffiliationUserRequest
 socket(packet)->validator(do)->processor(do)->commandMapping(affiliation.execute)->affiliation_getCode->2.RM(getCode)->get_emailid->3.SM(getEmail)->CB(incCommandID)->generator(getCode)->4.RM(redisExecute)->RM(setAndExpire)->5.redisClient(setex)->6.SM(getCMSCode)->RM(setCode)->7.redisClient(setex)->dispatcher(dispatchResponse)->8.socketStore(writeToMobile)->dispatcher(socketHandler)->MS(setUnicastID)->9.requestQueue(set).
 
 
-
 <a name="1011a"></a>
 command type:SubscribeMe
 ## 14)Command 1011
@@ -1507,8 +1498,7 @@ command type:SubscribeMe
    5.Send listResponse,commandLengthType ToMobile //where listResponse = payload
 
    FLOW
-   socket(packet)->validator(do)->processor(do)->commandMapping(SC.subscriptionCommands)->RM(getAlmonds)->requestQueue(set)->AQP(sendToQueue)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
-
+socket(packet)->validator(do)->processor(do)->commandMapping(SC.subscriptionCommands)->RM(getAlmonds)->requestQueue(set)->AQP(sendToQueue)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
 
 
 <a name="1011b"></a>
@@ -1535,8 +1525,7 @@ command type:PaymentDetails
    5.Send listResponse,commandLengthType ToMobile //where listResponse = payload
 
    FLOW
-   socket(packet)->validator(do)->processor(do)->commandMapping(SC.subscriptionCommands)->RM(getAlmonds)->requestQueue(set)->AQP(sendToQueue)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
-
+socket(packet)->validator(do)->processor(do)->commandMapping(SC.subscriptionCommands)->RM(getAlmonds)->requestQueue(set)->AQP(sendToQueue)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
 
 
 <a name="1011c"></a>
@@ -1562,7 +1551,7 @@ command type:UpdateCard
    5.Send listResponse,commandLengthType ToMobile //where listResponse = payload
 
    FLOW
-   socket(packet)->validator(do)->processor(do)->commandMapping(SC.subscriptionCommands)->RM(getAlmonds)->requestQueue(set)->AQP(sendToQueue)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
+socket(packet)->validator(do)->processor(do)->commandMapping(SC.subscriptionCommands)->RM(getAlmonds)->requestQueue(set)->AQP(sendToQueue)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
 
 
 
@@ -1589,7 +1578,7 @@ command type:DeleteSubscription
    5.Send listResponse,commandLengthType ToMobile //where listResponse = payload
 
    FLOW
-   socket(packet)->validator(do)->processor(do)->commandMapping(SC.subscriptionCommands)->RM(getAlmonds)->requestQueue(set)->AQP(sendToQueue)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
+socket(packet)->validator(do)->processor(do)->commandMapping(SC.subscriptionCommands)->RM(getAlmonds)->requestQueue(set)->AQP(sendToQueue)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
    
    
    <a name="1013"></a>
@@ -1611,10 +1600,10 @@ command type:IOTScanResults
    3.Send listResponse,commandLengthType ToMobile //where listResponse = payload
 
    FLOW
-   socket(packet)->validator(do)->processor(do)->commandMapping(almond.IOTScan)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
+socket(packet)->validator(do)->processor(do)->commandMapping(almond.IOTScan)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
    
    
-    <a name="61"></a>
+   <a name="61"></a>
 command type:AlmondNameChange
 ## 19)Command 61
    Command no
@@ -1706,7 +1695,7 @@ command type:DeleteAccountRequest
    Required
    Command,CommandType,Payload,almondMAC
 
-     SQL -
+   SQL 
    2.Select on Users
      params:EmailID
    3.Delete on Users
@@ -1716,7 +1705,7 @@ command type:DeleteAccountRequest
    10.Update on AllAlmondPlus
      params: AlmondMAC
 
-   REDIS -
+   REDIS 
    4.hgetall on UID_<packet.userid>
    5.del on UID_<packet.userid>
 
@@ -1927,7 +1916,7 @@ command type:DeleteSecondaryUserRequest
 socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(AM_J.DeleteSecondaryUser)->deleteUser->SM(removeSecondaryAlmond)->RM(removeSecondaryAlmond)->RM(removeSecondaryUserFromMAC)->RM(removeMACFromUser)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->MS(writeToMobile)->dispatcher(unicast)->broadcaster(unicast)->RM(getAlmond)->CB(incCommandID)->generator(getCode)->Random_Key->RM(redisExecute)->RM(setAndExpire)->AQP(sendToQueue)->dispatcher(broadcast)->broadcaster(broadcast)->requestQueue(del)->MS(sendRequest)->MS(writeToMobile)->sendToRemoteUsers->RM(redisExecuteAll)->dispatchToQueues->AQP(sendToQueue).
 
 
-    <a name="1110f"></a>
+   <a name="1110f"></a>
 command type:UserInviteRequest
 ## 27)Command 1110
    Command no
@@ -1986,7 +1975,7 @@ command type:UserInviteRequest
    socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(AM_J.UserInvite)->CheckIfEmailExists-> RM(getAlmonds)->SM(checkSecondary)->SM(addSecondaryAlmond)->RM(addSecondaryAlmond)->RM(addSecondaryUserToMAC)->RM(addMACToUser)->addUser->SM(getEmail)->RM(getAlmond)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->dispatcher(unicast)->broadcaster(unicast)->RM(getAlmond)->CB(incCommandID)->generator(getCode)->Random_Key->RM(redisExecute)->RM(setAndExpire)->AQP(sendToQueue)->dispatcher(broadcast)->broadcaster(broadcast)->MS(getSockets)->requestQueue(del)->MS(sendRequest)->MS(writeToMobile)->sendToRemoteUsers->RM(redisExecuteAll)->dispatchToQueues->AQP(sendToQueue).
 
 
-<a name="1110f"></a>
+  <a name="1110f"></a>
 command type:UnlinkAlmondRequest
 ## 28)Command 1110
    Command no
@@ -2015,6 +2004,7 @@ command type:UnlinkAlmondRequest
    Flow
 socket(on)->LOG(debug)->validator(do)->validator(checkCredentials)->SM(getUser)->validator(check)->RM(verifyAffiliation)->RM.getUsers->processor(do)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->dispatcher(unicast)->commandMapping.unicast(AM_J.getAlmond)->RM(getAlmond)->broadcaster(unicast)->AQP(sendToQueue).
 
+
 <a name="1110h"></a>
 command type:UserProfileRequest
 ## 29)Command 1110
@@ -2035,5 +2025,55 @@ command type:UserProfileRequest
 
    Flow
 socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(AM_J.UserProfile)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
+
+
+<a name="300"></a>
+command type:NotificationPreferences
+## 30)Command 300
+   Command no
+   300- XML format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.Insert on NotificationPreferences
+     params: AlmondMAC, DeviceID, UserID,IndexVal, NotificationType
+
+   Redis
+   4.hgetall on UID_:<userList>
+
+   Queue
+   5.Send NotificationPreferencesResponse to MobileQueue
+
+   Functional
+   1.Command 300
+
+   3.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   Flow
+socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(update_notification_preferences)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->dispatcher(broadcast)->broadcaster(broadcast)->sendToRemoteUsers->RM(redisExecuteAll)->dispatchToQueues->AQP(sendToQueue).
+
+
+  <a name="283"></a>
+command type:NotificationDeleteRegistrationRequest
+## 31)Command 283
+   Command no
+   283- XML format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.DELETE FROM NotificationID
+   Params:HashVal, RegID, Platform
+
+   Functional
+   1.Command 283
+   
+   3.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   Flow
+socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(Mobile_Notification_Delete_Registration)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
    
    
