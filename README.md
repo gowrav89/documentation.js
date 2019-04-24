@@ -1103,8 +1103,10 @@ command type:DynamicSceneRemoved
    ## 26)Command 1110-DeleteSecondaryUserRequest
    ## 27)Command 1110-UserInviteRequest
    ## 28)Command 1110-UnlinkAlmondRequest
-  
-  
+   ## 29)Command 1110-UserProfileRequest
+   
+   
+   
 <a name="1061"></a>
 command type:ActivateScene
 ## 1)Command 1061
@@ -2012,5 +2014,26 @@ command type:UnlinkAlmondRequest
 
    Flow
 socket(on)->LOG(debug)->validator(do)->validator(checkCredentials)->SM(getUser)->validator(check)->RM(verifyAffiliation)->RM.getUsers->processor(do)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->dispatcher(unicast)->commandMapping.unicast(AM_J.getAlmond)->RM(getAlmond)->broadcaster(unicast)->AQP(sendToQueue).
+
+<a name="1110h"></a>
+command type:UserProfileRequest
+## 29)Command 1110
+   Command no
+   1110- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.SELECT FROM Users
+   Params:UserID
+
+   Functional
+   1.Command 1110
+
+   3.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   Flow
+socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(AM_J.UserProfile)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
    
    
