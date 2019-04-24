@@ -1921,12 +1921,10 @@ command type:DeleteSecondaryUserRequest
 
 
    Flow
-   socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(AM_J.DeleteSecondaryUser)->deleteUser->SM(removeSecondaryAlmond)->RM(removeSecondaryAlmond)->RM(removeSecondaryUserFromMAC)->RM(removeMACFromUser)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->MS(writeToMobile)->dispatcher(unicast)->broadcaster(unicast)->RM(getAlmond)->CB(incCommandID)->generator(getCode)->Random_Key->RM(redisExecute)->RM(setAndExpire)->AQP(sendToQueue)->dispatcher(broadcast)->broadcaster(broadcast)->requestQueue(del)->MS(sendRequest)->MS(writeToMobile)->sendToRemoteUsers->RM(redisExecuteAll)->dispatchToQueues->AQP(sendToQueue).
+socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(AM_J.DeleteSecondaryUser)->deleteUser->SM(removeSecondaryAlmond)->RM(removeSecondaryAlmond)->RM(removeSecondaryUserFromMAC)->RM(removeMACFromUser)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->MS(writeToMobile)->dispatcher(unicast)->broadcaster(unicast)->RM(getAlmond)->CB(incCommandID)->generator(getCode)->Random_Key->RM(redisExecute)->RM(setAndExpire)->AQP(sendToQueue)->dispatcher(broadcast)->broadcaster(broadcast)->requestQueue(del)->MS(sendRequest)->MS(writeToMobile)->sendToRemoteUsers->RM(redisExecuteAll)->dispatchToQueues->AQP(sendToQueue).
 
 
-
-
-   xx<a name="1110f"></a>
+    <a name="1110f"></a>
 command type:UserInviteRequest
 ## 27)Command 1110
    Command no
@@ -1945,25 +1943,26 @@ command type:UserInviteRequest
    5.INSERT INTO AlmondSecondaryUsers
    Params:AlmondMAC, userID
 
-   8.Select EmailID from Users
+   8.Select from Users
    Params:UserID
 
    Redis
    3.hgetall on UID_:<packet.userid>
   
-   6.hmset on AL_:<AlmondMAC>                  // value=SUSER_packet.userid, 1
+   6.hmset on AL_:<AlmondMAC>                // value=SUSER_<packet.userid>, 1
 
-   7.hmset on UID_:<packet.userid>            // value=SMAC_AlmondMAC, 1
+   7.hmset on UID_:<packet.userid>          // value=SMAC_<AlmondMAC>, 1
 
    9.hgetall on AL_:<AlmondMAC>
 
    11.hgetall on AL_:<AlmondMAC>
 
-   12.get on ICID_<string>                  // here <string> = random string data
+   12.get on ICID_<string>                // here <string> = random string data
 
-   13.setex on ICID_<string>,TIMEOUT,config.SERVER_NAME      // here <string> = random string data
-
-   17.hgetall on UID_:<userList>
+   13.setex on ICID_<string>,TIMEOUT,config.SERVER_NAME    // here <string> = random string data
+   
+   multi
+   17.hgetall on UID_:<data.SecondaryUsers>
 
    Queue
    14.Send  UserInviteRequestResponse to config.SERVER_NAME
