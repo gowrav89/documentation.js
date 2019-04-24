@@ -2191,7 +2191,11 @@ command type:Signup
 
    3.Send listResponse,commandLengthType ToMobile //where listResponse = payload
 
+   //if (userSession.length == 1)
+   5.delete socketStore[socket.userid]
+
    Flow
-socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(accountSetup.Mob_Signup)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->dispatcher(socketHandler)->MS(remove)->RM(redisExecute).
-   
+   socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(accountSetup.Mob_Signup)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->dispatcher(socketHandler)->MS(remove)->RM(redisExecute).
+
+
    
