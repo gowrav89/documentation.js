@@ -1106,7 +1106,8 @@ command type:DynamicSceneRemoved
    ## 29)Command 1110-UserProfileRequest
    ## 30)Command 300-NotificationPreferences
    ## 31)Command 283-NotificationDeleteRegistrationRequest
-   
+   ## 32)Command 281-NotificationAddRegistration
+
 
 <a name="1061"></a>
 command type:ActivateScene
@@ -2075,5 +2076,37 @@ command type:NotificationDeleteRegistrationRequest
 
    Flow
 socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(Mobile_Notification_Delete_Registration)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
+
+
+  <a name="281"></a>
+command type:NotificationAddRegistration
+## 32)Command 281
+   Command no
+   281- XML format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.SELECT FROM NotificationID
+   Params:HashVal
+
+   //if (rows.length == 0)
+   3.Insert on NotificationID
+     params: HashVal, RegID, UserID, Platform
+
+           (or)
+
+   //if (rows.length == 1)
+   3.Update on NotificationID
+     params:  UserID,Platform,RegID
+
+   Functional
+   1.Command 281
+
+   4.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   Flow
+socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(Mobile_Notification_Registration)->Notification_Process_And_Add->Notification_Update->dispatcher(dispatchResponse)->socketStore(writeToMobile).
    
    
