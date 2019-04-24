@@ -1109,9 +1109,12 @@ command type:DynamicSceneRemoved
    ## 32)Command 281-NotificationAddRegistration
    ## 33)Command 151-AlmondModeRequest
    ## 34)Command 113-NotificationPreferenceListRequest
-   ## 35)Command  102-CloudSanity
+   ## 35)Command 102-CloudSanity
    ## 36)Command 6-Signup
-  
+   ## 37)Command 3-Logout
+   ## 38)Command-logoutall
+   
+
 <a name="1061"></a>
 command type:ActivateScene
 ## 1)Command 1061
@@ -1182,7 +1185,7 @@ command type:ClientList
    3.Send listResponse,commandLengthType ToMobile //where listResponse = payload
 
    Flow
-   socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping.model->genericModel(execute)->genericModel(get)->genericModel(hash).
+socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping.model->genericModel(execute)->genericModel(get)->genericModel(hash).
 
 
    <a name="1700a"></a>
@@ -1339,8 +1342,7 @@ command type:Logout
 
    7.Send listResponse,commandLengthType ToMobile //where listResponse = payload
 
-   Flow
-   socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(model)->L(logout)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->MS(writeToMobile)->dispatcher(socketHandler)->MS(remove)->RM(redisExecute)->secondaryModel(model)->notification(do)->genericModel(delete)->dispatcher(dispatchResponse).
+   Flow  socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(model)->L(logout)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->MS(writeToMobile)->dispatcher(socketHandler)->MS(remove)->RM(redisExecute)->secondaryModel(model)->notification(do)->genericModel(delete)->dispatcher(dispatchResponse).
 
 
 
@@ -1364,7 +1366,7 @@ command type:UpdateNotificationRegistration
    3.Send listResponse,commandLengthType ToMobile //where listResponse = payload
 
    FLOW
-   socket(packet)->validator(do)->processor(do)->commandMapping(notification.do)->genericModel(insertOrUpdate)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
+socket(packet)->validator(do)->processor(do)->commandMapping(notification.do)->genericModel(insertOrUpdate)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
 
 
    <a name="1112"></a>
@@ -2195,7 +2197,71 @@ command type:Signup
    5.delete socketStore[socket.userid]
 
    Flow
-   socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(accountSetup.Mob_Signup)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->dispatcher(socketHandler)->MS(remove)->RM(redisExecute).
+socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(accountSetup.Mob_Signup)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->dispatcher(socketHandler)->MS(remove)->RM(redisExecute).
+
+
+ <a name="3"></a>
+command type:Logout
+## 37)Command 3
+   Command no
+   3- XML format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.DELETE FROM UserTempPasswords
+   Params:UserID, TempPassword
+
+   Redis
+   4.hmset on UID_:<userid>         //value=[Q_config.SERVER_NAME,userSession.length - 1]
+
+
+   Functional
+   1.Command 3
+
+   3.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   //if (userSession.length == 1)
+   5.delete socketStore[socket.userid]
+
+   Flow socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(L.logout)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->dispatcher(socketHandler).
+   
+
+
+  <a name="4"></a>
+command type:logoutall
+## 38)Command 4
+   Command no
+   4- XML format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.SELECT from Users
+   Params:EmailID
+
+   3.DELETE FROM UserTempPasswords
+   Params:UserID
+
+   4.DELETE FROM NotificationID
+   Params:UserID
+
+   Redis
+   7.hgetall on UID_:<userList>
+
+   Queue
+   8.Send logoutallResponse to MobileQueue
+
+   Functional
+   1.Command 4
+
+   5.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   6.delete socketStore[userid]
+
+   Flow  socket(on)->LOG(debug)->validator(do)->validator(checkCredentials)->SM(getUser)->processor(do)->commandMapping(L.logoutAll)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->dispatcher(socketHandler)->MS(removeAll)->dispatcher(broadcast)->broadcaster(broadcast)->sendToRemoteUsers->RM(redisExecuteAll)->dispatchToQueues->AQP(sendToQueue).
 
 
    
