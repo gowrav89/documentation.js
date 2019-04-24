@@ -1109,8 +1109,9 @@ command type:DynamicSceneRemoved
    ## 32)Command 281-NotificationAddRegistration
    ## 33)Command 151-AlmondModeRequest
    ## 34)Command 113-NotificationPreferenceListRequest
-   
-
+   ## 35)Command  102-CloudSanity
+   ## 36)Command 6-Signup
+  
 <a name="1061"></a>
 command type:ActivateScene
 ## 1)Command 1061
@@ -1364,8 +1365,6 @@ command type:UpdateNotificationRegistration
 
    FLOW
    socket(packet)->validator(do)->processor(do)->commandMapping(notification.do)->genericModel(insertOrUpdate)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
-
-
 
 
    <a name="1112"></a>
@@ -2153,5 +2152,46 @@ command type:NotificationPreferenceListRequest
 
    Flow
 socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(get_notification_preference_list)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
+
+
+<a name="102"></a>
+command type:CloudSanity
+## 35)Command  102 
+   Command no
+   102- XML format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Functional
+   1.Command 102
+
+   Flow
+   socket(on)->LOG(debug)->validator(do)->processor(do).
+
+
+   <a name="6"></a>
+command type:Signup
+## 36)Command 6
+   Command no
+   6- XML format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.SELECT FROM Users
+   Params:EmailID 
+
+   Redis
+   4.hmset on UID_:<userid>         //value=[Q_config.SERVER_NAME,userSession.length - 1]
+
+   Functional
+   1.Command 6
+
+   3.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   Flow
+socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(accountSetup.Mob_Signup)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->dispatcher(socketHandler)->MS(remove)->RM(redisExecute).
    
    
