@@ -1102,7 +1102,8 @@ command type:DynamicSceneRemoved
    ## 25)Command 1110-DeleteMeAsSecondaryUserRequest 
    ## 26)Command 1110-DeleteSecondaryUserRequest
    ## 27)Command 1110-UserInviteRequest
-
+   ## 28)Command 1110-UnlinkAlmondRequest
+  
   
 <a name="1061"></a>
 command type:ActivateScene
@@ -1982,5 +1983,34 @@ command type:UserInviteRequest
    Flow
    socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(AM_J.UserInvite)->CheckIfEmailExists-> RM(getAlmonds)->SM(checkSecondary)->SM(addSecondaryAlmond)->RM(addSecondaryAlmond)->RM(addSecondaryUserToMAC)->RM(addMACToUser)->addUser->SM(getEmail)->RM(getAlmond)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->dispatcher(unicast)->broadcaster(unicast)->RM(getAlmond)->CB(incCommandID)->generator(getCode)->Random_Key->RM(redisExecute)->RM(setAndExpire)->AQP(sendToQueue)->dispatcher(broadcast)->broadcaster(broadcast)->MS(getSockets)->requestQueue(del)->MS(sendRequest)->MS(writeToMobile)->sendToRemoteUsers->RM(redisExecuteAll)->dispatchToQueues->AQP(sendToQueue).
 
+
+<a name="1110f"></a>
+command type:UnlinkAlmondRequest
+## 28)Command 1110
+   Command no
+   1110- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.SELECT from Users
+   Params: EmailID
+
+   Redis
+   3.hgetall on AL_:<AlmondMAC>
+
+   5.hgetall on AL_:<AlmondMAC>
+
+   Queue
+   6.Send  UnlinkAlmondResponse to almondserver
+
+   Functional
+   1.Command 1110
+
+   4.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   Flow
+socket(on)->LOG(debug)->validator(do)->validator(checkCredentials)->SM(getUser)->validator(check)->RM(verifyAffiliation)->RM.getUsers->processor(do)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->dispatcher(unicast)->commandMapping.unicast(AM_J.getAlmond)->RM(getAlmond)->broadcaster(unicast)->AQP(sendToQueue).
    
    
