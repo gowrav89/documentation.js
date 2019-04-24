@@ -1107,7 +1107,9 @@ command type:DynamicSceneRemoved
    ## 30)Command 300-NotificationPreferences
    ## 31)Command 283-NotificationDeleteRegistrationRequest
    ## 32)Command 281-NotificationAddRegistration
-
+   ## 33)Command 151-AlmondModeRequest
+   ## 34)Command 113-NotificationPreferenceListRequest
+   
 
 <a name="1061"></a>
 command type:ActivateScene
@@ -2108,5 +2110,48 @@ command type:NotificationAddRegistration
 
    Flow
 socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(Mobile_Notification_Registration)->Notification_Process_And_Add->Notification_Update->dispatcher(dispatchResponse)->socketStore(writeToMobile).
+
+<a name="151"></a>
+command type:AlmondModeRequest
+## 33)Command 151
+   Command no
+   151- XML format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.SELECT FROM AlmondPreferences
+   Params:T1.AlmondMAC
+
+   Functional
+   1.Command 151
+
+   3.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   Flow
+socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(almond.get_almondmode)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
+
+
+   <a name="113"></a>
+command type:NotificationPreferenceListRequest
+## 34)Command  113
+   Command no
+   113- XML format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.SELECT FROM NotificationPreferences
+   params:AlmondMAC, UserID
+
+   Functional
+   1.Command 113
+
+   3.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   Flow
+socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(get_notification_preference_list)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
    
    
