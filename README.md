@@ -1118,7 +1118,9 @@ command type:DynamicSceneRemoved
    ## 41)Command 1526-GetClientPreferences
    ## 42)Command 1400-RuleList
    ## 43)Command 1200-DeviceList
-
+   ## 44)Command 1300-SceneList
+  
+  
 <a name="1061"></a>
 command type:ActivateScene
 ## 1)Command 1061
@@ -2404,5 +2406,26 @@ command type:DeviceList
    Flow
 socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(device.execute)->genericModel(get)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
 
+
+<a name="1300"></a>
+command type:SceneList
+## 44)Command 1300
+   Command no
+   1300- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.SELECT from SCENE
+   Params:AlmondMAC
+
+   Functional
+   1.Command 1300
+
+   3.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   Flow
+socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(genericModel.execute)->genericModel(get)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
 
    
