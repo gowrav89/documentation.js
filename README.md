@@ -1116,7 +1116,8 @@ command type:DynamicSceneRemoved
    ## 39)Command 2222-Restore
    ## 40)Command 1525-UpdateClientPreferences
    ## 41)Command 1526-GetClientPreferences
-    
+   ## 42)Command 1400-RuleList
+   ## 43)Command 1200-DeviceList
 
 <a name="1061"></a>
 command type:ActivateScene
@@ -2350,6 +2351,58 @@ command type:GetClientPreferences
 
    Flow
 socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(get_wifi_notification_preferences)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
+
+
+XX<a name="1400"></a>
+command type:RuleList
+## 42)Command 1400
+   Command no
+   1400- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Functional
+   1.Command 1400
+
+   Flow
+   socket(on)->LOG(debug)->validator(do)->processor(do).
+
+
+   <a name="1200"></a>
+command type:DeviceList
+## 43)Command 1200
+   Command no
+   1200- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.SELECT from DEVICE_DATA
+   Params:AlmondMAC
+
+   Redis
+   3.hgetall on MAC:<AlmondMAC>
+
+   multi
+   4.hgetall on (MAC:<AlmondMAC>,DeviceValues) 
+      //Here, multi is done on all AlmondMAC and the IDs present in DeviceValues  
+      
+
+   //*if (payload.Action == "get")*//
+   3.hgetall on MAC:<AlmondMAC>
+
+   multi
+   4.hgetall on MAC:<AlmondMAC>
+
+   Functional
+   1.Command 1200
+
+   5.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   Flow
+socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(device.execute)->genericModel(get)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
 
 
    
