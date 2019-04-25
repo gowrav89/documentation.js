@@ -1123,7 +1123,7 @@ command type:DynamicSceneRemoved
    ## 46)Command 806-
    ## 47)Command 804a-for device
    ## 48)Command 804-for client
-
+   ## 49)Command 1004-Super_Login 
 
 <a name="1061"></a>
 command type:ActivateScene
@@ -2359,7 +2359,7 @@ command type:GetClientPreferences
 socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(get_wifi_notification_preferences)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
 
 
-XX<a name="1400"></a>
+  <a name="1400"></a>
 command type:RuleList
 ## 42)Command 1400
    Command no
@@ -2432,8 +2432,9 @@ command type:SceneList
    Flow
 socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(genericModel.execute)->genericModel(get)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
 
- <a name="1"></a>
-command type:res
+
+  <a name="1"></a>
+command type:Login
 ## 45)Command 1
    Command no
    1- XML format
@@ -2465,9 +2466,9 @@ command type:res
 
    Flow
 socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(L.Mob_Login)->L(manualLogin)->L(Mob_Add_TempPass)->L(SetMACsToUserRedis)->RM(getAllAlmonds)->dispatcher.dispatch(Response)->socketStore(writeToMobile)->dispatcher(socketHandler)->RM(redisExecute)->secondaryModel(L.GetSubscriptions)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
+   
 
-
-   XX<a name="806"></a>
+   <a name="806"></a>
 command type:
 ## 46)Command 806
    Command no
@@ -2479,6 +2480,11 @@ command type:
    Functional
    1.Command 806
 
+   2.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   Flow
+   socket(on)->LOG(debug)->validator(do)->processor(do)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
+
 
    <a name="804a"></a>
 command type:for device
@@ -2489,16 +2495,17 @@ command type:for device
    Required
    Command,CommandType,Payload,almondMAC
 
-   CASSANDRA 
+   Cassandra
    2.Select on dynamic_log
    params: mac,id
 
    Functional
    1.Command 804
 
-   2.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+   3.Send listResponse,commandLengthType ToMobile //where listResponse = payload
 
-   Flow socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(notification.get_logs)->getMACFromClientID->dispatcher(dispatchResponse)->socketStore(writeToMobile).
+   Flow
+socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(notification.get_logs)->getMACFromClientID->dispatcher(dispatchResponse)->socketStore(writeToMobile).
 
 
    <a name="804b"></a>
@@ -2514,13 +2521,68 @@ command type:for client
    2.Select on WifiClients
    params:AlmondMAC,ClientID
  
-   CASSANDRA -
+   Cassandra
    3.Select on dynamic_log
    params: mac,id
 
    Functional
    1.Command 804
 
-   Flow socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(notification.get_logs)->getMACFromClientID->dispatcher(dispatchResponse)->socketStore(writeToMobile).
+   4.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   Flow
+socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(notification.get_logs)->getMACFromClientID->dispatcher(dispatchResponse)->socketStore(writeToMobile).
+
+
+
+   <a name="1004"></a>
+command type:Super_Login 
+## 49)Command 1004
+   Command no
+   1004- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.SELECT FROM Date, Users
+   Params:EmailID
+
+   3.INSERT INTO UserTempPasswords
+   Params:UserID, TempPassword, LastUsedTime
+
+   Redis
+   4.hgetall on UID_:<UserID>
+
+   6.hincrby on UID_:<packet.userid>  //value=[Q_config.SERVER_NAME,1]
+
+   Functional
+   1.Command 1004
+
+   5.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   Flow
+socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(L.Mob_Login)->L(manualLogin)->L(Mob_Add_TempPass)->L(SetMACsToUserRedis)->RM(getAllAlmonds)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->dispatcher(socketHandler)->RM(redisExecute).
+
+
+   <a name="800"></a>
+## 50.Command 800
+   Command no
+   800- XML format
+
+   Required
+   Command,CommandType,Payload
+
+   Cassandra
+   2.Select on notification_store.notification_records
+   params:usr_id
+
+   Functional
+   1.Command 800
+   3.Send listResponse,commandLengthType ToMobile       //where listResponse = payload
+
+   Flow
+socket(packet)->validator(do)->processor(do)->notificationFetcher(getNotifications)->oldRowBuilder(get_notifications)->dispacher(dispatchResponse).
+
 
    
