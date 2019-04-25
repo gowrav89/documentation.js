@@ -1125,6 +1125,9 @@ command type:DynamicSceneRemoved
    ## 48)Command 804-for client
    ## 49)Command 1004-Super_Login 
    ## 50.Command 800
+   ## 51)Command 1050-AlmondPropertiesResponse
+   ## 52)Command 1011-CheckSubscriptionStatus
+  
 
 <a name="1061"></a>
 command type:ActivateScene
@@ -2584,6 +2587,53 @@ socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(L.Mob_Login
 
    Flow
 socket(packet)->validator(do)->processor(do)->notificationFetcher(getNotifications)->oldRowBuilder(get_notifications)->dispacher(dispatchResponse).
+
+
+
+<a name="1050"></a>
+command type:AlmondPropertiesResponse
+## 51)Command 1050
+   Command no
+   1050- JSON format
+
+   Required
+   Command,CommandType,Payload
+
+   SQL
+   2.SELECT FROM AlmondProperties2
+   Params:AlmondMAC
+
+   Functional
+   1.Command 1050
+
+   3.Send listResponse,commandLengthType ToMobile    //where listResponse = payload
+
+   Flow
+   socket(packet)->validator(do)->processor(do)->commandMapping(almond.AlmondProperties)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
+
+
+ <a name="1011"></a>
+command type:CheckSubscriptionStatus
+## 52)Command 1011
+   Command no
+   1011- JSON format
+
+   Required
+   Command,CommandType,Payload
+
+   Redis
+   2.hgetall on UID_:<packet.userid>
+
+   Queue
+   3.Send  CheckSubscriptionStatus to config.SERVER_NAME
+
+   Functional
+   1.Command 1011
+
+   4.Send listResponse,commandLengthType ToMobile    //where listResponse = payload
+
+   Flow
+socket(packet)->validator(do)->processor(do)->commandMapping(SC.subscriptionCommands)->RM(getAlmonds)->AQP(sendToQueue)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
 
 
    
