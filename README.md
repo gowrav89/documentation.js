@@ -1114,6 +1114,9 @@ command type:DynamicSceneRemoved
    ## 37)Command 3-Logout
    ## 38)Command 4-logoutall
    ## 39)Command 2222-Restore
+   ## 40)Command 1525-UpdateClientPreferences
+   ## 41)Command 1526-GetClientPreferences
+    
 
 <a name="1061"></a>
 command type:ActivateScene
@@ -2294,6 +2297,59 @@ command type:Restore
 
    Flow
 socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(notificationFetcher.almondHistroy)->loggerPoint(execute)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->dispatcher(unicast)->broadcaster(unicast)->RM(getAlmond)->CB(incCommandID)->generator(getCode)->Random_Key->RM(redisExecute)->RM(setAndExpire)->AQP(sendToQueue).
+
+
+<a name="1525"></a>
+command type:UpdateClientPreferences
+## 40)Command 1525
+   Command no
+   1525- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   //* if data.NotificationType == 0 *//
+   2.DELETE FROM WifiClientsNotificationPreferences
+   Params:AlmondMAC, ClientID, UserID
+
+   Redis
+   5.hgetall on UID_:<userList>
+
+   Queue
+   6.Send GetClientPreferencesResponse to MobileQueue
+
+   Functional
+   1.Command 1525
+
+   3.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   4.delete store[id]
+
+   Flow
+socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(change_wificlient_notification_preferences)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->dispatcher(broadcast)->broadcaster(broadcast)->MS(getSockets)->requestQueue(del)->MS(sendRequest)->RM(redisExecuteAll)->dispatchToQueues->AQP(sendToQueue).
+
+
+   <a name="1526"></a>
+command type:GetClientPreferences
+## 41)Command 1526
+   Command no
+   1526- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.Select FROM WifiClientsNotificationPreferences
+   Params:AlmondMAC, UserID
+
+   Functional
+   1.Command 1526
+
+   3.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   Flow
+socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(get_wifi_notification_preferences)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
 
 
    
