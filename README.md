@@ -1119,8 +1119,12 @@ command type:DynamicSceneRemoved
    ## 42)Command 1400-RuleList
    ## 43)Command 1200-DeviceList
    ## 44)Command 1300-SceneList
-  
-  
+   ## 45)Command 1-res
+   ## 46)Command 806-
+   ## 47)Command 804a-for device
+   ## 48)Command 804-for client
+
+
 <a name="1061"></a>
 command type:ActivateScene
 ## 1)Command 1061
@@ -2427,5 +2431,96 @@ command type:SceneList
 
    Flow
 socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(genericModel.execute)->genericModel(get)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
+
+ <a name="1"></a>
+command type:res
+## 45)Command 1
+   Command no
+   1- XML format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.SELECT FROM Date, Users
+   Params:EmailID
+
+   3.INSERT INTO UserTempPasswords
+   Params:UserID, TempPassword, LastUsedTime
+
+   7.SELECT FROM Subscriptions
+   Params:AlmondMAC
+
+   Redis
+   4.hgetall on UID_:<UserID>
+
+   6.hincrby on UID_:<packet.userid>  //value=[Q_config.SERVER_NAME,1]
+
+   Functional
+   1.Command 1
+
+   5.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   8.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   Flow
+socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(L.Mob_Login)->L(manualLogin)->L(Mob_Add_TempPass)->L(SetMACsToUserRedis)->RM(getAllAlmonds)->dispatcher.dispatch(Response)->socketStore(writeToMobile)->dispatcher(socketHandler)->RM(redisExecute)->secondaryModel(L.GetSubscriptions)->dispatcher(dispatchResponse)->socketStore(writeToMobile).
+
+
+   XX<a name="806"></a>
+command type:
+## 46)Command 806
+   Command no
+   806- XML format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Functional
+   1.Command 806
+
+
+   <a name="804a"></a>
+command type:for device
+## 47)Command 804
+   Command no
+   804- XML format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   CASSANDRA 
+   2.Select on dynamic_log
+   params: mac,id
+
+   Functional
+   1.Command 804
+
+   2.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   Flow socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(notification.get_logs)->getMACFromClientID->dispatcher(dispatchResponse)->socketStore(writeToMobile).
+
+
+   <a name="804b"></a>
+command type:for client
+## 48)Command 804
+   Command no
+   804- XML format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.Select on WifiClients
+   params:AlmondMAC,ClientID
+ 
+   CASSANDRA -
+   3.Select on dynamic_log
+   params: mac,id
+
+   Functional
+   1.Command 804
+
+   Flow socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(notification.get_logs)->getMACFromClientID->dispatcher(dispatchResponse)->socketStore(writeToMobile).
 
    
