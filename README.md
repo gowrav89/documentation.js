@@ -1120,10 +1120,11 @@ command type:DynamicSceneRemoved
    ## 43)Command 1200-DeviceList
    ## 44)Command 1300-SceneList
    ## 45)Command 1-res
-   ## 46)Command 806-
+   ## 46)Command 806
    ## 47)Command 804a-for device
    ## 48)Command 804-for client
    ## 49)Command 1004-Super_Login 
+   ## 50.Command 800
 
 <a name="1061"></a>
 command type:ActivateScene
