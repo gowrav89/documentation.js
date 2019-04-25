@@ -1112,8 +1112,8 @@ command type:DynamicSceneRemoved
    ## 35)Command 102-CloudSanity
    ## 36)Command 6-Signup
    ## 37)Command 3-Logout
-   ## 38)Command-logoutall
-   
+   ## 38)Command 4-logoutall
+   ## 39)Command 2222-Restore
 
 <a name="1061"></a>
 command type:ActivateScene
@@ -2262,6 +2262,38 @@ command type:logoutall
    6.delete socketStore[userid]
 
    Flow  socket(on)->LOG(debug)->validator(do)->validator(checkCredentials)->SM(getUser)->processor(do)->commandMapping(L.logoutAll)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->dispatcher(socketHandler)->MS(removeAll)->dispatcher(broadcast)->broadcaster(broadcast)->sendToRemoteUsers->RM(redisExecuteAll)->dispatchToQueues->AQP(sendToQueue).
+   
+   
+   <a name="2222"></a>
+command type:Restore
+## 39)Command 2222
+   Command no
+   2222- XML format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Cassandra
+   2.select from almondhistory
+   Params:mac, type
+
+   Redis
+   4.hgetall on AL_:<almondMAC>
+
+   5.get on ICID_<string>                // here <string> = random string data
+
+   6.setex on ICID_<string>,TIMEOUT,config.SERVER_NAME    // here <string> = random string data
+
+   Queue
+   7.Send  RestoreResponse to config.SERVER_NAME
+
+   Functional
+   1.Command 2222
+
+   3.Send listResponse,commandLengthType ToMobile //where listResponse = payload
+
+   Flow
+socket(on)->LOG(debug)->validator(do)->processor(do)->commandMapping(notificationFetcher.almondHistroy)->loggerPoint(execute)->dispatcher(dispatchResponse)->socketStore(writeToMobile)->dispatcher(unicast)->broadcaster(unicast)->RM(getAlmond)->CB(incCommandID)->generator(getCode)->Random_Key->RM(redisExecute)->RM(setAndExpire)->AQP(sendToQueue).
 
 
    
