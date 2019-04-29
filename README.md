@@ -2643,7 +2643,13 @@ socket(packet)->validator(do)->processor(do)->commandMapping(SC.subscriptionComm
 ## 4)Command 1200-DynamicAllDevicesRemoved
 
 ## 6)Command 63-AlmondModeChange
-
+## 7)Command 1050-DynamicAlmondProperties
+## 8)Command 63-AlmondNameChangeResponse sucess="true"
+## 9)Command 1063-AlmondNameChangeResponse success="false"
+## 10)Command 1063-DynamicAlmondProperties
+## 11)Command 1063-UpdateDeviceIndex "Success":"true"
+## 12)Command 104-KeepAlive
+## 13)Command 1030-AlmondReset
 
 <a name="106"></a>
 command type:AlmondValidationRequest
@@ -2793,6 +2799,144 @@ command type:DynamicAlmondProperties
 
    Flow
 almondProtocol(on)->processor(do)->validate->commandMapping(AU.properties)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
+
+<a name="63"></a>
+command type:AlmondNameChangeResponse sucess="true"
+## 8)Command 63
+   Command no
+   63-XML format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.get on ICID_:<unicastID>            // value = null
+
+   multi
+   4.hgetall on UID_:<userList>       // Returns all the queues for users in user_list
+
+   Queue
+   3.Send Response to All Queues returned in Step 2
+
+   5.Send Response to All Queues returned in Step 4
+
+   Functional
+   1.Command 63
+
+   Flow
+   almondProtocol(on)->processor(do)->validate->commandMapping(AU.dummyModel)->broadcaster(unicast)->RM(redisExecute)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
+
+
+   <a name="1063"></a>
+command type:AlmondNameChangeResponse success="false"
+## 9)Command 1063
+   Command no
+   1063-JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.get on ICID_:<packet.ICID>
+
+   Queue
+   3.Send Response to All Queues returned in Step 2
+
+   Functional
+   1.Command 1063
+
+   Flow
+   almondProtocol(on)->processor(do)->commandMapping(AU.dummyModel)->RM(redisExecute)->publisher(sendToQueue).
+
+
+   <a name="1063"></a>
+command type:DynamicAlmondProperties
+## 10)Command 1063
+   Command no
+   1063-JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.get on ICID_:<packet.ICID>
+
+   Queue
+   3.Send Response to All Queues returned in Step 2
+
+   Functional
+   1.Command 1063
+
+   Flow
+   almondProtocol(on)->processor(do)->commandMapping(AU.dummyModel)->RM(redisExecute)->publisher(sendToQueue).
+
+
+  <a name="1063"></a>
+command type:UpdateDeviceIndex "Success":"true"
+## 11)Command 1063
+   Command no
+   1063-JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.get on ICID_:<packet.ICID>
+
+   Queue
+   3.Send Response to All Queues returned in Step 2
+
+   Functional
+   1.Command 1063
+
+   Flow
+   almondProtocol(on)->processor(do)->commandMapping(AU.dummyModel)->RM(redisExecute)->publisher(sendToQueue).
+
+
+   <a name="104"></a>
+command type:KeepAlive
+## 12)Command 104
+   Command no
+   104- XML format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   3.hmset on AL_:<socket.almondMAC>   
+                           // value=[status, 1, serverconfig.Connections.RabbitMQ.Queue]
+
+                            
+   Cassandra
+   // if (socket.zenAlmond)
+   4.Update on cloudlogs.connection_log
+     params: dateyear, mac
+
+   Functional
+   1.Command 104
+
+   2.delete socket.almondOnline
+
+   Flow
+   almondProtocol(on)->processor(do)->commandMapping(MS.keepAlive)->RS(updateAlmond).
+
+
+   <a name="1030"></a>
+command type:AlmondReset
+## 13)Command 1030
+   Command no
+   1030- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Functional
+   1.Command 1030
+
+   2.Send AlmondResetResponse to Almond
+
+   Flow
+   almondProtocol(on)->processor(do)->commandMapping(AU.almondReset)->sendToAlmond->socketStore(writeToAlmond).
 
 
 
