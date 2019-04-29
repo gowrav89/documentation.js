@@ -2652,6 +2652,8 @@ socket(packet)->validator(do)->processor(do)->commandMapping(SC.subscriptionComm
 ## 13)Command 1030-AlmondReset
 ## 14)Command 21-AffiliationAlmondRequest
 ## 15)Command 8-CloudReset
+## 16)Command 49-DynamicAlmondNameChange
+
 
 <a name="106"></a>
 command type:AlmondValidationRequest
@@ -2996,6 +2998,32 @@ command type:CloudReset
 
    Flow
 almondProtocol(on)->processor(do)->commandMapping(AU.almondReset)->sendToAlmond->socketStore(writeToAlmond)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues.
+
+
+<a name="49"></a>
+command type:DynamicAlmondNameChange
+## 16)Command 49
+   Command no
+   49- XML format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Queue
+   3.Send DynamicAlmondNameChange to BACKGROUND_QUEUE
+
+   5.Send Response to All Queues returned in Step 4
+
+   Redis
+   multi
+   4.hgetall on UID_:<userList>       // Returns all the queues for users in user_list
+
+   Functional
+   1.Command 49
+
+   2.Send DynamicAlmondNameChangeResponse to Almond
+
+   Flow  almondProtocol(on)->processor(do)->commandMapping(AU.dummyModel)->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
 
 
 
