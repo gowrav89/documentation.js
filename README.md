@@ -2650,6 +2650,8 @@ socket(packet)->validator(do)->processor(do)->commandMapping(SC.subscriptionComm
 ## 11)Command 1063-UpdateDeviceIndex "Success":"true"
 ## 12)Command 104-KeepAlive
 ## 13)Command 1030-AlmondReset
+## 14)Command 21-AffiliationAlmondRequest
+## 15)Command 8-CloudReset
 
 <a name="106"></a>
 command type:AlmondValidationRequest
@@ -2966,6 +2968,34 @@ command type:AffiliationAlmondRequest
    6.Send AffiliationAlmondResponse to Almond
 
    Flow almondProtocol(on)->processor(do)->commandMapping(AU.affiliation_almond)->AFF(affiliate_almond)->Check_If_Affiliated->Almond_ID_Check->generator(getCode)->Random_Key->RM(redisExecute)->RM(setAndExpire)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond).
+   
+   
+   
+    <a name="8"></a>
+command type:CloudReset
+## 15)Command 8
+   Command no
+   8- XML format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   multi
+   4.hgetall on UID_:<userList>       // Returns all the queues for users in user_list
+
+   Queue
+   3.Send CloudReset to BACKGROUND_QUEUE
+
+   5.Send Response to All Queues returned in Step 4 
+
+   Functional
+   1.Command 8
+
+   2.Send CloudResetResponse to Almond
+
+   Flow
+almondProtocol(on)->processor(do)->commandMapping(AU.almondReset)->sendToAlmond->socketStore(writeToAlmond)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues.
 
 
 
