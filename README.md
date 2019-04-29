@@ -2642,6 +2642,8 @@ socket(packet)->validator(do)->processor(do)->commandMapping(SC.subscriptionComm
 ## 3)Command 1600-AddWiredSlaveMobile
 ## 4)Command 1200-DynamicAllDevicesRemoved
 
+## 6)Command 63-AlmondModeChange
+
 
 <a name="106"></a>
 command type:AlmondValidationRequest
@@ -2737,6 +2739,33 @@ command type:DynamicAllDevicesRemoved
 
    Flow
 almondProtocol(on)->processor(do)->validate->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->publisher(sendToQueue).
+
+
+<a name="63"></a>
+command type:AlmondModeChange
+## 6)Command 63 
+   Command no
+   63- XML format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.get on ICID_:<unicastID>          // value = null
+
+   multi
+   4.hgetall on UID_:<userList>       // Returns all the queues for users in user_list
+
+   Queue
+   3.Send Response to All Queues returned in Step 2
+
+   5.Send Response to All Queues returned in Step 4
+
+   Functional
+   1.Command 63
+
+   Flow
+almondProtocol(on)->processor(do)->validate->commandMapping(AU.dummyModel)->broadcaster(unicast)->RM(redisExecute)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
 
 
 
