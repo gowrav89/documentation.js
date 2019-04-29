@@ -2768,5 +2768,32 @@ command type:AlmondModeChange
 almondProtocol(on)->processor(do)->validate->commandMapping(AU.dummyModel)->broadcaster(unicast)->RM(redisExecute)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
 
 
+<a name="1050"></a>
+command type:DynamicAlmondProperties
+## 7)Command 1050 
+   Command no
+   1050-JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Queue
+   3.Send  DynamicAllDevicesRemovedResponse to BACKGROUND_QUEUEE
+
+   5.Send Response to All Queues returned in Step 
+
+   Redis
+   multi
+   4.hgetall on UID_:<userList>       // Returns all the queues for users in user_list
+
+   Functional
+   1.Command 1050
+
+   2.Send ADynamicAlmondPropertiesResponse to Almond
+
+   Flow
+almondProtocol(on)->processor(do)->validate->commandMapping(AU.properties)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
+
+
 
    
