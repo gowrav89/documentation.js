@@ -2937,6 +2937,35 @@ command type:AlmondReset
 
    Flow
    almondProtocol(on)->processor(do)->commandMapping(AU.almondReset)->sendToAlmond->socketStore(writeToAlmond).
+   
+   <a name="21"></a>
+command type:AffiliationAlmondRequest
+## 14)Command 21
+   Command no
+   21- XML format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   SQL
+   2.SELECT FROM AlmondUsers
+   Params:AlmondMAC, ownership
+
+   3.SELECT FROM AllAlmondPlus
+   Params:AlmondMAC
+
+   Redis
+   4.hgetall on CODE:<code>           // here code= get_random_string
+
+   5.setex on CODE:<code>        
+      // where code = random string,values =AlmondMAC+config.Connections.RabbitMQ.Queue
+
+   Functional
+   1.Command 21
+
+   6.Send AffiliationAlmondResponse to Almond
+
+   Flow almondProtocol(on)->processor(do)->commandMapping(AU.affiliation_almond)->AFF(affiliate_almond)->Check_If_Affiliated->Almond_ID_Check->generator(getCode)->Random_Key->RM(redisExecute)->RM(setAndExpire)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond).
 
 
 
