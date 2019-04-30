@@ -2661,6 +2661,9 @@ socket(packet)->validator(do)->processor(do)->commandMapping(SC.subscriptionComm
 ## 23)Command 1300-DynamicSceneUpdated "Action":"update"
 ## 24)Command 1300-DynamicSceneRemoved "Action":"remove"
 ## 25)Command 1300-DynamicSceneActivated "Action":"update"
+## 26)Command 1500-DynamicClientAdded "Action":"add"
+## 27)Command 1500-DynamicClientUpdated "Action":"update"
+## 28)Command 1500-DynamicClientRemoved "Action":"remove"
 
 
 XX<a name="25"></a>
@@ -3371,3 +3374,92 @@ command type:DynamicSceneActivated "Action":"update"
 
    Flow
 almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->publisher(sendToQueue).
+
+<a name="1500"></a>
+command type:DynamicClientAdded "Action":"add"
+## 26)Command 1500
+   Command no
+   1500- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.hmset on AL_:<AlmondMAC>    //value=[mapper.hashColumn, payload.HashNow]\
+
+   Redis
+   multi
+   5.hgetall on UID_:<userList>       // Returns all the queues for users in user_list
+
+   6.Send Response to All Queues returned in Step 5
+
+   Queue
+   4.Send DynamicClientAdded to BACKGROUND_QUEUE
+
+   Functional
+   1.Command 1500
+
+   3.Send DynamicClientAddedResponse to Almond
+
+   Flow
+   almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
+
+
+
+   <a name="1500"></a>
+command type:DynamicClientUpdated "Action":"update"
+## 27)Command 1500
+   Command no
+   1500- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.hmset on AL_:<AlmondMAC>    //value=[mapper.hashColumn, payload.HashNow]\
+
+   Redis
+   multi
+   5.hgetall on UID_:<userList>       // Returns all the queues for users in user_list
+
+   6.Send Response to All Queues returned in Step 5
+
+   Queue
+   4.Send DynamicClientUpdated to BACKGROUND_QUEUE
+
+   Functional
+   1.Command 1500
+
+   3.Send DynamicClientUpdatedResponse to Almond
+
+   Flow
+   almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
+
+
+   <a name="1500"></a>
+command type:DynamicClientRemoved "Action":"remove"
+## 28)Command 1500
+   Command no
+   1500- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.hmset on AL_:<AlmondMAC>    //value=[mapper.hashColumn, payload.HashNow]\
+
+   Redis
+   multi
+   5.hgetall on UID_:<userList>       // Returns all the queues for users in user_list
+
+   6.Send Response to All Queues returned in Step 5
+
+   Queue
+   4.Send DynamicClientRemoved to BACKGROUND_QUEUE
+
+   Functional
+   1.Command 1500
+
+   3.Send DynamicClientRemovedResponse to Almond
+
+   Flow  almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
