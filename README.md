@@ -2660,6 +2660,10 @@ socket(packet)->validator(do)->processor(do)->commandMapping(SC.subscriptionComm
 ## 21)Command 1500-DynamicClientLeft "Action"="update"
 ## 22)Command 1200-DynamicIndexUpdated "Action":"UpdateIndex"
 ## 23)Command 1063-UpdateDeviceName "Success":"true"
+## 24)Command 1200-DynamicDeviceUpdated "Action":"update"
+## 25)Command 1063-AddScene
+## 26)Command 1300-DynamicSceneAdded "Action":"add"
+## 27)Command 1063-UpdateScene "Success":"true"
 
 
 <a name="106"></a>
