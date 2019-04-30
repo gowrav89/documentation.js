@@ -2653,6 +2653,8 @@ socket(packet)->validator(do)->processor(do)->commandMapping(SC.subscriptionComm
 ## 14)Command 21-AffiliationAlmondRequest
 ## 15)Command 8-CloudReset
 ## 16)Command 49-DynamicAlmondNameChange
+## 17)Command 153-DynamicAlmondModeChangeRequest
+## 18)Command 1702-HashList
 
 
 <a name="106"></a>
@@ -3024,6 +3026,54 @@ command type:DynamicAlmondNameChange
    2.Send DynamicAlmondNameChangeResponse to Almond
 
    Flow  almondProtocol(on)->processor(do)->commandMapping(AU.dummyModel)->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
+   
+   <a name="153"></a>
+command type:DynamicAlmondModeChangeRequest
+## 17)Command 153
+   Command no
+   153- XML format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Queue
+   3.Send DynamicAlmondNameChange to BACKGROUND_QUEUE
+
+   5.Send Response to All Queues returned in Step 4
+
+   Redis
+   multi
+   4.hgetall on UID_:<userList>       // Returns all the queues for users in user_list
+
+   Functional
+   1.Command 153
+
+   2.Send DynamicAlmondModeChangeResponse to Almond
+
+   Flow
+almondProtocol(on)->processor(do)->commandMapping(AU.almondmode_change)->sendToAlmond->socketStore(writeToAlmond)->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
+
+   <a name="1702"></a>
+command type:HashList
+## 18)Command 1702
+   Command no
+   1702- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   3.hmset on AL_:<socket.almondMAC>     //values=["router", payload.RouterMode]
+
+   Functional
+   1.Command 1702
+
+   2.delete socket[i]
+
+   4.Send HashListResponse to Almond
+
+   Flow
+almondProtocol(on)->processor(do)->commandMapping(AU.checkAllHash)->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond).
 
 
 
