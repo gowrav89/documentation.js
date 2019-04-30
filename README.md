@@ -3226,6 +3226,102 @@ command type:UpdateDeviceName "Success":"true"
    Flow
 almondProtocol(on)->processor(do)->commandMapping(AU.dummyModel)->unicast->broadcaster(unicast)->RM(redisExecute)->publisher(sendToQueue).
 
+xx<a name="1200"></a>
+command type:DynamicDeviceUpdated "Action":"update"
+## 24)Command 1200
+   Command no
+   1200- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.hmset on AL_:<AlmondMAC>    //value=[mapper.hashColumn, payload.HashNow]
+
+   Redis
+   multi
+   5.hgetall on UID_:<userList>       // Returns all the queues for users in user_list
+
+   Queue
+   4.Send DynamicIndexUpdated to BACKGROUND_QUEUE
+
+   6.Send Response to All Queues returned in Step 5
+
+   Functional
+   1.Command 1200
+
+   3.Send DynamicDeviceUpdatedResponse to Almond
+
+   Flow  almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground-> broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues.
+   
+
+   xx<a name="1063"></a>
+command type:AddScene
+## 25)Command 1063
+   Command no
+   1063- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.get on  ICID_:<packet.ICID> 
+
+   Queue
+   3.Send Response to All Queues returned in Step 2
+
+   Functional
+   1.Command 1063
+
+   Flow  almondProtocol(on)->processor(do)->commandMapping(AU.dummyModel)->unicast->broadcaster(unicast)->RM(redisExecute)->publisher(sendToQueue).
 
 
+ xx<a name="1300"></a>
+command type:DynamicSceneAdded "Action":"add"
+## 26)Command 1300
+   Command no
+   1300- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.hmset on AL_:<AlmondMAC>    //value=[mapper.hashColumn, payload.HashNow]
+
+   Redis
+   multi
+   5.hgetall on UID_:<userList>       // Returns all the queues for users in user_list
+
+   Queue
+   4.Send DynamicIndexUpdated to BACKGROUND_QUEUE
+
+   6.Send Response to All Queues returned in Step 5
+
+   Functional
+   1.Command 1300
+
+   3.Send DynamicSceneAddedResponse to Almond
+
+   Flow almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->publisher(sendToQueue).
+
+
+  xx<a name="1063"></a>
+command type:UpdateScene "Success":"true"
+## 27)Command 1063
+   Command no
+   1063- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.get on ICID_:<packet.ICID>
+
+   Queue
+   3.Send Response to All Queues returned in Step 2
+
+   Functional
+   1.Command 1063
+
+   Flow   almondProtocol(on)->processor(do)->commandMapping(AU.dummyModel)->unicast->broadcaster(unicast)->RM(redisExecute)->publisher(sendToQueue).
    
