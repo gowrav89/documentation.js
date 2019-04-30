@@ -2658,6 +2658,8 @@ socket(packet)->validator(do)->processor(do)->commandMapping(SC.subscriptionComm
 ## 19)Command 1200-DynamicDeviceRemoved
 ## 20)Command 1500-DynamicClientJoined "Action"="update"
 ## 21)Command 1500-DynamicClientLeft "Action"="update"
+## 22)Command 1200-DynamicIndexUpdated "Action":"UpdateIndex"
+## 23)Command 1063-UpdateDeviceName "Success":"true"
 
 
 <a name="106"></a>
@@ -3167,6 +3169,62 @@ command type:DynamicClientLeft "Action"="update"
 
    Flow
 almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
+
+
+<a name="1200"></a>
+command type:DynamicIndexUpdated "Action":"UpdateIndex"
+## 22)Command 1200
+   Command no
+   1200- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.hmset on AL_:<AlmondMAC>    //value=[mapper.hashColumn, payload.HashNow]
+
+   Redis
+   multi
+   7.hgetall on UID_:<userList>       // Returns all the queues for users in user_list
+
+   Queue
+   4.Send DynamicIndexUpdated to config.ALEXA_QUEUE
+
+   6.Send DynamicIndexUpdated to BACKGROUND_QUEUE
+
+   8.Send Response to All Queues returned in Step 7
+
+   Functional
+   1.Command 1200
+
+   3.Send DynamicIndexUpdatedResponse to Almond
+
+   5.delete packet.alexa
+
+   Flow
+almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground-> broadcaster(sendToBackground)->sendToHttp->publisher(sendToQueue)->->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
+
+
+  <a name="1063"></a>
+command type:UpdateDeviceName "Success":"true"
+## 23)Command 1063
+   Command no
+   1063- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.get on  ICID_:<packet.ICID> 
+
+   Queue
+   3.Send Response to All Queues returned in Step 2
+
+   Functional
+   1.Command 1063
+
+   Flow
+almondProtocol(on)->processor(do)->commandMapping(AU.dummyModel)->unicast->broadcaster(unicast)->RM(redisExecute)->publisher(sendToQueue).
 
 
 
