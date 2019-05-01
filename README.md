@@ -2664,6 +2664,10 @@ socket(packet)->validator(do)->processor(do)->commandMapping(SC.subscriptionComm
 ## 26)Command 1500-DynamicClientAdded "Action":"add"
 ## 27)Command 1500-DynamicClientUpdated "Action":"update"
 ## 28)Command 1500-DynamicClientRemoved "Action":"remove"
+## 29)Command 1400-DynamicRuleAdded "Action":"add"
+## 30)Command 1400-DynamicRuleUpdated "Action":"update"
+## 31)Command 1400-DynamicRuleRemoved "Action":"remove"
+## 32)Command 1400-DynamicAllRulesRemoved "Action":"remove"
 
 
 XX<a name="25"></a>
@@ -2700,7 +2704,6 @@ command type:AffiliationAlmondComplete
    Queue
    11.Send Response to All Queues returned in Step 
 
-
    Functional
    1.Command 25
 
@@ -2709,7 +2712,7 @@ command type:AffiliationAlmondComplete
    9.Send AffiliationAlmondCompleteResponse to Almond
 
    Flow
-   almondProtocol(on)->processor(do)->validate->commandMapping(AU.affiliation_almond_complete)->RM(getCode)->verify_affiliation_complete->checkAlexaCompatible->broadcaster(sendToBackground)->MS(removeAff)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->broadcaster(unicast)->RM(redisExecute).
+almondProtocol(on)->processor(do)->validate->commandMapping(AU.affiliation_almond_complete)->RM(getCode)->verify_affiliation_complete->checkAlexaCompatible->broadcaster(sendToBackground)->MS(removeAff)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->broadcaster(unicast)->RM(redisExecute).
 
 
    <a name="63"></a>
@@ -2736,7 +2739,7 @@ command type:AlmondModeChangeResponse success="true"
    1.Command 63
 
    Flow
-   almondProtocol(on)->processor(do)->validate->commandMapping(AU.dummyModel)->broadcaster(unicast)->RM(redisExecute)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
+almondProtocol(on)->processor(do)->validate->commandMapping(AU.dummyModel)->broadcaster(unicast)->RM(redisExecute)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
 
 
    <a name="1050"></a>
@@ -2763,7 +2766,7 @@ command type:DynamicAlmondProperties
    2.Send ADynamicAlmondPropertiesResponse to Almond
 
    Flow
-   almondProtocol(on)->processor(do)->validate->commandMapping(AU.properties)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
+almondProtocol(on)->processor(do)->validate->commandMapping(AU.properties)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
 
 
 <a name="63"></a>
@@ -2790,7 +2793,7 @@ command type:AlmondNameChangeResponse sucess="true"
    1.Command 63
 
    Flow
-   almondProtocol(on)->processor(do)->validate->commandMapping(AU.dummyModel)->broadcaster(unicast)->RM(redisExecute)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
+almondProtocol(on)->processor(do)->validate->commandMapping(AU.dummyModel)->broadcaster(unicast)->RM(redisExecute)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
 
 
 <a name="1063"></a>
@@ -2888,7 +2891,7 @@ command type:AffiliationAlmondRequest
    6.Send AffiliationAlmondResponse to Almond
 
    Flow
-   almondProtocol(on)->processor(do)->commandMapping(AU.affiliation_almond)->AFF(affiliate_almond)->Check_If_Affiliated->Almond_ID_Check->generator(getCode)->Random_Key->RM(redisExecute)->RM(setAndExpire)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond).
+almondProtocol(on)->processor(do)->commandMapping(AU.affiliation_almond)->AFF(affiliate_almond)->Check_If_Affiliated->Almond_ID_Check->generator(getCode)->Random_Key->RM(redisExecute)->RM(setAndExpire)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond).
 
 
    <a name="8"></a>
@@ -2915,7 +2918,7 @@ command type:CloudReset
    2.Send CloudResetResponse to Almond
 
    Flow
-   almondProtocol(on)->processor(do)->commandMapping(AU.almondReset)->sendToAlmond->socketStore(writeToAlmond)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues.
+almondProtocol(on)->processor(do)->commandMapping(AU.almondReset)->sendToAlmond->socketStore(writeToAlmond)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues.
 
 
 <a name="49"></a>
@@ -2942,7 +2945,7 @@ command type:DynamicAlmondNameChange
    2.Send DynamicAlmondNameChangeResponse to Almond
 
    Flow
-   almondProtocol(on)->processor(do)->commandMapping(AU.dummyModel)->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
+almondProtocol(on)->processor(do)->commandMapping(AU.dummyModel)->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
 
 
   <a name="153"></a>
@@ -2969,7 +2972,7 @@ command type:DynamicAlmondModeChangeRequest
    2.Send DynamicAlmondModeChangeResponse to Almond
 
    Flow
-   almondProtocol(on)->processor(do)->commandMapping(AU.almondmode_change)->sendToAlmond->socketStore(writeToAlmond)->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
+almondProtocol(on)->processor(do)->commandMapping(AU.almondmode_change)->sendToAlmond->socketStore(writeToAlmond)->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
 
 
    <a name="1702"></a>
@@ -2992,7 +2995,7 @@ command type:HashList
    4.Send HashListResponse to Almond
 
    Flow
-   almondProtocol(on)->processor(do)->commandMapping(AU.checkAllHash)->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond).
+almondProtocol(on)->processor(do)->commandMapping(AU.checkAllHash)->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond).
 
 
    <a name="106"></a>
@@ -3037,7 +3040,7 @@ command type:ReadyToAddAsSlave,
    1.Command 1600
 
    Flow
-   almondProtocol(on)->processor(do)->validate->commandMapping(AU.dummyModel)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
+almondProtocol(on)->processor(do)->validate->commandMapping(AU.dummyModel)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
 
 
  <a name="1200"></a>
@@ -3065,7 +3068,7 @@ command type:DynamicAllDevicesRemoved
    3.Send DynamicAllDevicesRemovedResponse to Almond
 
    Flow
-   almondProtocol(on)->processor(do)->validate->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->publisher(sendToQueue).
+almondProtocol(on)->processor(do)->validate->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->publisher(sendToQueue).
   
 
 <a name="1500"></a>
@@ -3095,7 +3098,7 @@ command type:DynamicClientJoined "Action"="update"
    3.Send DynamicClientJoinedResponse to Almond
 
    Flow
-   almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
+almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
 
 
 <a name="1500"></a>
@@ -3125,7 +3128,7 @@ command type:DynamicClientLeft "Action"="update"
    3.Send DynamicClientLeftResponse to Almond
 
    Flow
-   almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
+almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
    
 
 <a name="1200"></a>
@@ -3159,7 +3162,7 @@ command type:DynamicIndexUpdated "Action":"UpdateIndex"
    5.delete packet.alexa
 
    Flow
-   almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground-> broadcaster(sendToBackground)->sendToHttp->publisher(sendToQueue)->->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
+almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground-> broadcaster(sendToBackground)->sendToHttp->publisher(sendToQueue)->->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
 
 
    <a name="1200"></a>
@@ -3189,7 +3192,7 @@ command type:DynamicDeviceRemoved
    3.Send DynamicDeviceRemovedResponse to Almond
 
    Flow
-   almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground-> broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
+almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground-> broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
 
 
   xx<a name="1200"></a>
@@ -3219,7 +3222,7 @@ command type:DynamicDeviceUpdated "Action":"update"
    3.Send DynamicDeviceUpdatedResponse to Almond
 
    Flow
-   almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground-> broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues.
+almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground-> broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues.
 
 
    xx<a name="1300"></a>
@@ -3249,7 +3252,7 @@ command type:DynamicSceneAdded "Action":"add"
    3.Send DynamicSceneAddedResponse to Almond
 
    Flow
-   almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->publisher(sendToQueue).
+almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->publisher(sendToQueue).
 
    
    <a name="1300"></a>
@@ -3279,11 +3282,9 @@ command type:DynamicAllSceneRemoved "Action":"remove"
    3.Send DynamicAllSceneRemovedResponse to Almond
 
    Flow
-   almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->publisher(sendToQueue).
+almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->publisher(sendToQueue).
 
 
-
-   
    <a name="1300"></a>
 command type:DynamicSceneUpdated "Action":"update"
 ## 23)Command 1300
@@ -3311,8 +3312,7 @@ command type:DynamicSceneUpdated "Action":"update"
    3.Send DynamicSceneAddedResponse to Almond
 
    Flow
-   almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->publisher(sendToQueue).
-
+almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->publisher(sendToQueue).
 
 
    <a name="1300"></a>
@@ -3342,8 +3342,7 @@ command type:DynamicSceneRemoved "Action":"remove"
    3.Send DynamicSceneRemovedResponse to Almond
 
    Flow
-   almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->publisher(sendToQueue).
-
+almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->publisher(sendToQueue).
 
 
    <a name="1300"></a>
@@ -3402,8 +3401,7 @@ command type:DynamicClientAdded "Action":"add"
    3.Send DynamicClientAddedResponse to Almond
 
    Flow
-   almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
-
+almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
 
 
    <a name="1500"></a>
@@ -3433,7 +3431,7 @@ command type:DynamicClientUpdated "Action":"update"
    3.Send DynamicClientUpdatedResponse to Almond
 
    Flow
-   almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
+almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
 
 
    <a name="1500"></a>
@@ -3463,3 +3461,122 @@ command type:DynamicClientRemoved "Action":"remove"
    3.Send DynamicClientRemovedResponse to Almond
 
    Flow  almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
+  
+
+  <a name="1400"></a>
+command type:DynamicRuleAdded "Action":"add"
+## 29)Command 1400
+   Command no
+   1400- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.hmset on AL_:<AlmondMAC>    //value=[mapper.hashColumn, payload.HashNow]
+
+   Redis
+   multi
+   5.hgetall on UID_:<userList>       // Returns all the queues for users in user_list
+
+   6.Send Response to All Queues returned in Step 5
+
+   Queue
+   4.Send DynamicRuleAdded to BACKGROUND_QUEUE
+
+   Functional
+   1.Command 1400
+
+   3.Send DynamicRuleAddedResponse to Almond
+
+   Flow almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcast->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
+
+
+<a name="1400"></a>
+command type:DynamicRuleUpdated "Action":"update"
+## 30)Command 1400
+   Command no
+   1400- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.hmset on AL_:<AlmondMAC>    //value=[mapper.hashColumn, payload.HashNow]
+
+   Redis
+   multi
+   5.hgetall on UID_:<userList>       // Returns all the queues for users in user_list
+
+   6.Send Response to All Queues returned in Step 5
+
+   Queue
+   4.Send DynamicRuleUpdated to BACKGROUND_QUEUE
+
+   Functional
+   1.Command 1400
+
+   3.Send DynamicRuleUpdatedResponse to Almond
+
+   Flow
+almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcast->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
+
+
+   <a name="1400"></a>
+command type:DynamicRuleRemoved "Action":"remove"
+## 31)Command 1400
+   Command no
+   1400- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.hmset on AL_:<AlmondMAC>    //value=[mapper.hashColumn, payload.HashNow]
+
+   Redis
+   multi
+   5.hgetall on UID_:<userList>       // Returns all the queues for users in user_list
+
+   6.Send Response to All Queues returned in Step 5
+
+   Queue
+   4.Send DynamicRuleRemoved to BACKGROUND_QUEUE
+
+   Functional
+   1.Command 1400
+
+   3.Send DynamicRuleRemovedResponse to Almond
+
+   Flow almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcast->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
+
+
+   <a name="1400"></a>
+command type:DynamicAllRulesRemoved "Action":"remove"
+## 32)Command 1400
+   Command no
+   1400- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.hmset on AL_:<AlmondMAC>    //value=[mapper.hashColumn, payload.HashNow]
+
+   Redis
+   multi
+   5.hgetall on UID_:<userList>       // Returns all the queues for users in user_list
+
+   6.Send Response to All Queues returned in Step 5
+
+   Queue
+   4.Send DynamicAllRulesRemoved to BACKGROUND_QUEUE
+
+   Functional
+   1.Command 1400
+
+   3.Send DynamicAllRulesRemovedResponse to Almond
+
+   Flow almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcast->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue). 
+   
+   
