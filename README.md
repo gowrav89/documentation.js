@@ -2674,6 +2674,9 @@ socket(packet)->validator(do)->processor(do)->commandMapping(SC.subscriptionComm
 ## 36)Command 1100-RebootRouter
 ## 37)Command 1100-SendLogs
 ## 38)Command 1100-FirmwareUpdate
+## 39)Command 1050-AlmondProperties
+## 40)Command 1050-DynamicAlmondProperties
+
 
 XX<a name="25"></a>
 command type:AffiliationAlmondComplete
@@ -3714,3 +3717,56 @@ command type:FirmwareUpdate
 
    Flow
 almondProtocol(on)->processor(do)->commandMapping(AU.dummyModel)->unicast->broadcaster(unicast)->RM(redisExecute)->publisher(sendToQueue).
+
+
+ <a name="1050"></a>
+command type:AlmondProperties
+## 39)Command 1050
+   Command no
+   1050- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Queue
+   3.Send AlmondProperties to BACKGROUND_QUEUE
+
+   5.Send Response to All Queues returned in Step 4
+
+   Redis
+   multi
+   4.hgetall on UID_:<userList>       // Returns all the queues for users in user_list
+
+   Functional
+   1.Command 1050
+
+   2.Send AlmondPropertiesResponse to Almond
+
+   Flow almondProtocol(on)->processor(do)->commandMapping(AU.properties)->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
+   
+
+   <a name="1050"></a>
+command type:DynamicAlmondProperties
+## 40)Command 1050
+   Command no
+   1050- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Queue
+   3.Send DynamicAlmondProperties to BACKGROUND_QUEUE
+
+   5.Send Response to All Queues returned in Step 4
+
+   Redis
+   multi
+   4.hgetall on UID_:<userList>       // Returns all the queues for users in user_list
+
+   Functional
+   1.Command 1050
+
+   2.Send DynamicAlmondPropertiesResponse to Almond
+
+   Flow
+almondProtocol(on)->processor(do)->commandMapping(AU.properties)->->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue).
