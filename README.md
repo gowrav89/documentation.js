@@ -2685,6 +2685,8 @@ ALMOND SERVER
 ## 43)Command 1500-DynamicAllClientsRemoved
 ## 44) Command no-AffiliationAlmondRequest
 ## 45) Command no-AffiliationCompleteResponse
+## 46)Command 1040-AlmondHello
+## 47)Command 1040-AlmondHello
 
   <a name="25"></a>
 command type:AffiliationAlmondComplete
@@ -3958,4 +3960,61 @@ command type: AffiliationAlmondRequest
 almondProtocol(packet)->processor(do)->processor(validate)->almondUsers(affiliation_almond_complete),almondUsers(verify_affiliaion_complete)->processor(dispatchResponses),processor(unicast)->broadcaster(unicast)->processor(broadcaster)->broadcaster(send).
  
  
- 
+  <a name="1040"></a>
+command type: AlmondHello
+## 46) Command no
+   Command no
+   1040- JSON format
+
+   Required
+   Command,UID,AlmondMAC,Payload,CommandType
+
+   Redis
+   2.hgetall on AL_<AlmondMAC>        // value = [mapper.hashColumn, payload.HashNow]
+   5.Perform multi:
+    i. hmset on UID_<UserID>      //key = (M.USER + UserID), value = (PMAC_<data.AlmondMAC>,1)
+    ii. hmset on AL_<pMAC>        //key = (M.ALMOND + pMAC), value = (userID,key)
+    iii. hdel on AL_<pMAC>        //key = (M.ALMOND + pMAC), value = [subscriptionToken]  
+
+   SQL    
+   3.Select on AlmondUsers
+     Parameters: AlmondMAC
+   4.Select on AlmondSecondaryUsers
+     Parameters: AlmondMAC
+
+   Functional
+   1.Command 1040
+
+   Flow
+   almondProtocol(packet)->processor(do)->processor(validate)->almondUsers(almond_hello).
+
+
+   <a name="31"></a>
+command type: AlmondHello
+## 47) Command no
+   Command no
+   31- JSON format
+
+   Required
+   Command,UID,AlmondMAC,PayloadCommandType
+
+   Redis
+   // value = [mapper.hashColumn, payload.HashNow]
+   2.hgetall on AL_<AlmondMAC>          
+
+   5.Perform multi:
+    i. hmset on UID_<UserID>      //key = (M.USER + UserID), value = (PMAC_<data.AlmondMAC>,1)
+    ii. hmset on AL_<pMAC>        //key = (M.ALMOND + pMAC), value = (userID,key)
+    iii. hdel on AL_<pMAC>        //key = (M.ALMOND + pMAC), value = [subscriptionToken]
+
+   SQL 
+   3.Select on AlmondUsers
+     Parameters: AlmondMAC
+   4.Select on AlmondSecondaryUsers
+     Parameters: AlmondMAC
+
+   Functional
+   1.Command 31
+
+   Flow
+   almondProtocol(packet)->processor(do)->processor(validate)->almondUsers(almond_hello).
