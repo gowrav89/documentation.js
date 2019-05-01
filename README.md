@@ -25,6 +25,8 @@
 ## 25)Command 1300-DynamicAllSceneRemoved
 
 
+
+
 <a name="1300a"></a>
 command type:DynamicSceneAdded
 ## 1)Command 1300
@@ -130,7 +132,7 @@ command type:DynamicSceneRemoved
    18.Delete on AlmondplusDB.NotificationID               //if (oldRegid && oldRegid.length > 0)
    params: RegI
 
-   29.select from SCSIDB.CMSAffiliations CA,             // if (!MACS[data.almondMAC])
+   19.select from SCSIDB.CMSAffiliations CA,             // if (!MACS[data.almondMAC])
                   lmondplusDB.AlmondUsers AU,
                   SCSIDB.CMS CMS   
    params: CA.CMSCode,AU.AlmondMAC                            
@@ -204,7 +206,7 @@ command type:DynamicSceneRemoved
 
    Redis
    /*if(Object.keys(variables).length==0) */
-   2.multi.hmset on MAC:%s, AlmondMAC key variable
+   2.multi.hmset on MAC, AlmondMAC,key,variable
 
              (or)
 
@@ -624,9 +626,6 @@ command type:DynamicSceneRemoved
     Required
    Command,CommandType,Payload,almondMAC
 
-    Functional
-   1.Command 1200
-
     Redis
     multi
     2.hdel on MAC:<AlmondMAC>, deviceId
@@ -640,6 +639,9 @@ command type:DynamicSceneRemoved
 
     5.select from SCSIDB.CMSAffiliations CA,AlmondplusDB.AlmondUsers AU,SCSIDB.CMS CMS
       Params:CA.CMSCode=CMS.CMSCode and AU.AlmondMAC = CA.AlmondMAC
+
+   Functional
+   1.Command 1200
 
    Flow
    socket(packet)->controller(processor)->preprocessor(doNothing)->model(device.execute)->redisDeviceValue(remove)->genericModel(remove)->CMS(sendFinal).
@@ -673,16 +675,16 @@ command type:DynamicSceneRemoved
     Required
    Command,CommandType,Payload,almondMAC
 
+    Redis
+    2.redisUpdate
+        // params:data, data.AlmondMAC
+
+
     Functional
     1.Command 153
 
-    Redis
-    2.redisUpdate
-     // params:data, data.AlmondMAC
-
     Flow
    socket(packet)->controller(processor)->preprocessor(doNothing)->ALC(changeMode).
-
 
 
 
@@ -1039,22 +1041,26 @@ command type:DynamicSceneRemoved
     multi
     2.hmset on MAC:<AlmondMAC> key, variables
 
+              (or)
+
     /*if (deviceArray.length>0)*/
     multi
-    3.hmset on MAC:<AlmondMAC> deviceArray
+    2.hmset on MAC:<AlmondMAC> deviceArray
 
    SQL
-   4.insert into  AlmondplusDB.DEVICE_DATA
+   3.insert into  AlmondplusDB.DEVICE_DATA
     Params:AlmondMAC 
-   5.select from SCSIDB.CMSAffiliations CA,AlmondplusDB.AlmondUsers AU,SCSIDB.CMS CMS 
+   4.select from SCSIDB.CMSAffiliations CA,AlmondplusDB.AlmondUsers AU,SCSIDB.CMS CMS 
     Params:CA.CMSCode=CMS.CMSCode and AU.AlmondMAC = CA.AlmondMAC 
 
    Functional
     1.Command 1200
 
-   Flow   socket(packet)->controller(processor)->preprocessor(dynamicDeviceUpdated)->model(device.execute)->DeviceStore(update)->genericModel(add)->scsi(sendFinal)->CMS(sendFinal).
-   
-   
+   Flow
+   socket(packet)->controller(processor)->preprocessor(dynamicDeviceUpdated)->model(device.execute)->DeviceStore(update)->genericModel(add)->scsi(sendFinal)->CMS(sendFinal).
+
+
+
     <a name="1300"></a>
 ## 25)DynamicAllSceneRemoved(Command 1300)
    Command no
@@ -1071,8 +1077,7 @@ command type:DynamicSceneRemoved
     1.Command 1300
 
    Flow
-   socket(packet)->controller(processor)->preprocessor(doNothing)->model(genericModel.execute)->genericModel(remove).
-   
+   socket(packet)->controller(processor)->preprocessor(doNothing)->model(genericModel.execute)->genericModel(remov
    
    
    ## 1)Command 1061-ActivateScene
