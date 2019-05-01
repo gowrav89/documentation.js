@@ -2668,7 +2668,12 @@ socket(packet)->validator(do)->processor(do)->commandMapping(SC.subscriptionComm
 ## 30)Command 1400-DynamicRuleUpdated "Action":"update"
 ## 31)Command 1400-DynamicRuleRemoved "Action":"remove"
 ## 32)Command 1400-DynamicAllRulesRemoved "Action":"remove"
-
+## 33)Command 1100-RouterSummary
+## 34)Command 1100-GetWirelessSettings
+## 35)Command 1100-SetWirelessSettings
+## 36)Command 1100-RebootRouter
+## 37)Command 1100-SendLogs
+## 38)Command 1100-FirmwareUpdate
 
 XX<a name="25"></a>
 command type:AffiliationAlmondComplete
@@ -3580,3 +3585,132 @@ command type:DynamicAllRulesRemoved "Action":"remove"
    Flow almondProtocol(on)->processor(do)->commandMapping(AU.execute)->updateHash->RM(updateAlmond)->dispatchResponses->sendToAlmond->socketStore(writeToAlmond)->sendToBackground->broadcaster(sendToBackground)->publisher(sendToQueue)->broadcast->broadcaster(send)->writeToMobileSockets->broadcaster(sendToRemoteUsers)->RM(redisExecuteAll)->sendToQueues->publisher(sendToQueue). 
    
    
+  <a name="1100"></a>
+command type:RouterSummary
+## 33)Command 1100
+   Command no
+   1100- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.get on ICID_:<packet.ICID>
+
+   Queue
+   3.Send Response to All Queues returned in Step 2
+
+   Functional
+   1.Command 1100
+
+   Flow
+almondProtocol(on)->processor(do)->commandMapping(AU.dummyModel)->unicast->broadcaster(unicast)->RM(redisExecute)->publisher(sendToQueue).
+
+
+   <a name="1100"></a>
+command type:GetWirelessSettings
+## 34)Command 1100
+   Command no
+   1100- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.get on ICID_:<packet.ICID>
+
+   Queue
+   3.Send Response to All Queues returned in Step 2
+
+   Functional
+   1.Command 1100
+
+   Flow
+almondProtocol(on)->processor(do)->commandMapping(AU.dummyModel)->unicast->broadcaster(unicast)->RM(redisExecute)->publisher(sendToQueue).
+
+
+   <a name="1100"></a>
+command type:SetWirelessSettings
+## 35)Command 1100
+   Command no
+   1100- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.get on ICID_:<packet.ICID>
+
+   Queue
+   3.Send Response to All Queues returned in Step 2
+
+   Functional
+   1.Command 1100
+
+   Flow
+almondProtocol(on)->processor(do)->commandMapping(AU.dummyModel)->unicast->broadcaster(unicast)->RM(redisExecute)->publisher(sendToQueue).
+
+
+   <a name="1100"></a>
+command type:RebootRouter
+## 36)Command 1100
+   Command no
+   1100- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.get on ICID_:<packet.ICID>
+
+   Queue
+   3.Send Response to All Queues returned in Step 2
+
+   Functional
+   1.Command 1100
+
+   Flow almondProtocol(on)->processor(do)->commandMapping(AU.dummyModel)->unicast->broadcaster(unicast)->RM(redisExecute)->publisher(sendToQueue).
+
+
+   <a name="1100"></a>
+command type:SendLogs
+## 37)Command 1100
+   Command no
+   1100- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.get on ICID_:<packet.ICID>
+
+   Queue
+   3.Send Response to All Queues returned in Step 2
+
+   Functional
+   1.Command 1100
+
+   Flow
+almondProtocol(on)->processor(do)->commandMapping(AU.dummyModel)->unicast->broadcaster(unicast)->RM(redisExecute)->publisher(sendToQueue).
+
+
+   <a name="1100"></a>
+command type:FirmwareUpdate
+## 38)Command 1100
+   Command no
+   1100- JSON format
+
+   Required
+   Command,CommandType,Payload,almondMAC
+
+   Redis
+   2.get on ICID_:<packet.ICID>
+
+   Queue
+   3.Send Response to All Queues returned in Step 2
+
+   Functional
+   1.Command 1100
+
+   Flow
+almondProtocol(on)->processor(do)->commandMapping(AU.dummyModel)->unicast->broadcaster(unicast)->RM(redisExecute)->publisher(sendToQueue).
